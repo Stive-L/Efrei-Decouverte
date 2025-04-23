@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Destinations | EFREI & DECOUVERTE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Liens vers ta police Google & ton CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700;500&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header id="navbar">
+        <div class="nav">
+            <div class="logo">EFREI & DECOUVERTE</div>
+            <nav>
+                <a href="../index.html">ACCUEIL</a>
+                <a href="destinations.html" class="active">DESTINATIONS</a>
+                <a href="avis.html">AVIS</a>
+                <a href="forum.html">FORUM</a>
+                <a href="login.html">SE CONNECTER</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <h2>Destinations proposées</h2>
+        <ul class="dest-list" id="dest-list">
+            <li>Chargement...</li>
+        </ul>
+    </main>
+    <footer>
+        <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
+    </footer>
+    <script>
+      // Récupère toutes les destinations depuis le back-end
+      fetch('http://localhost:3000/api/destinations')
+        .then(res => res.json())
+        .then(data => {
+          const ul = document.getElementById('dest-list');
+          if (!data.length) {
+            ul.innerHTML = "<li>Aucune destination disponible.</li>";
+            return;
+          }
+          ul.innerHTML = "";
+          data.forEach(dest => {
+            ul.innerHTML += `
+              <li>
+                <div class="universite">${dest.universite}</div>
+                <div class="ville">${dest.ville}, ${dest.pays}</div>
+                <div>Langue : ${dest.langue} &nbsp; | &nbsp; Coût de la vie : ${dest.cout_vie_moyen} €</div>
+                <a class="btn-fiche" href="destination.html?id=${dest.id_destination}">Voir la fiche</a>
+              </li>
+            `;
+          });
+        })
+        .catch(() => {
+          document.getElementById('dest-list').innerHTML = "<li>Erreur lors du chargement des destinations.</li>";
+        });
+    </script>
+</body>
+</html>

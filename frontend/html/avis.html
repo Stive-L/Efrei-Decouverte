@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Avis | EFREI & DECOUVERTE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700;500&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header id="navbar">
+        <div class="nav">
+            <div class="logo">EFREI & DECOUVERTE</div>
+            <nav>
+                <a href="index.html">ACCUEIL</a>
+                <a href="destinations.html">DESTINATIONS</a>
+                <a href="avis.html" class="active">AVIS</a>
+                <a href="forum.html">FORUM</a>
+                <a href="login.html">SE CONNECTER</a>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <h2>Avis des étudiants</h2>
+        <ul class="avis-list" id="avis-list">
+            <li>Chargement des avis...</li>
+        </ul>
+    </main>
+    <footer>
+        <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
+    </footer>
+    <script>
+    fetch('http://localhost:3000/api/avis')
+    .then(res => res.json())
+    .then(data => {
+        const ul = document.getElementById('avis-list');
+        if (!data.length) {
+        ul.innerHTML = "<li>Aucun avis disponible.</li>";
+        return;
+        }
+        ul.innerHTML = "";
+        data.forEach(avis => {
+        ul.innerHTML += `
+            <li class="avis-item">
+            <div class="avis-header">
+                <span class="avis-auteur">${avis.prenom} ${avis.nom}</span>
+                <span class="avis-date">${new Date(avis.date_creation).toLocaleDateString('fr-FR')}</span>
+            </div>
+            <div class="avis-destination"><b>${avis.universite}</b>, ${avis.ville}, ${avis.pays}</div>
+            <div class="avis-type">${avis.code_type} — ${avis.annee_mobilite}</div>
+            <div class="avis-commentaire">${avis.commentaire}</div>
+            <div class="avis-notes">
+                ${buildNoteBar("Qualité cours", avis.qualite_cours)}
+                ${buildNoteBar("Logement", avis.logement)}
+                ${buildNoteBar("Climat", avis.climat)}
+                ${buildNoteBar("Vie locale", avis.vie_locale)}
+                ${buildNoteBar("Accessibilité", avis.accessibilite)}
+                <!-- Ajoute d'autres critères si besoin -->
+            </div>
+            <div class="avis-footer">
+                <span class="avis-likes" onclick="likeAvis(${avis.id_avis}, this)">
+                <svg height="18" width="18" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:middle"><path d="M10.001 4.529c2.349-4.101 12.036-2.41 9.979 3.396-1.02 2.674-6.919 8.115-9.272 10.034-.381.304-.927.304-1.308 0C6.94 16.04 1.044 10.599.021 7.925c-2.055-5.806 7.629-7.497 9.98-3.396z"></path></svg>
+                <span>${avis.likes || 0}</span>
+                </span>
+                <button class="avis-signaler" onclick="signalerAvis(${avis.id_avis})">Signaler</button>
+            </div>
+            </li>
+        `;
+        });
+    });
+
+    function buildNoteBar(label, value) {
+    value = value || 0; // au cas où il manque une note
+    return `
+        <div class="avis-note">
+        <span class="avis-note-label">${label}</span>
+        <span class="avis-note-bar">
+            <span class="avis-note-bar-inner" style="width:${(value/5)*100}%"></span>
+        </span>
+        <span class="avis-note-val">${value}/5</span>
+        </div>
+    `;
+    }
+
+    // Bonus : (à compléter côté back pour maj BDD)
+    function likeAvis(id, el) {
+    // TODO: faire un POST pour like en vrai ! Ici on simule juste +1
+    let span = el.querySelector('span');
+    span.textContent = parseInt(span.textContent) + 1;
+    el.style.color = "#34926c";
+    }
+    function signalerAvis(id) {
+    alert('Merci, le signalement est pris en compte (à implémenter côté back)');
+    }
+    </script>
+</body>
+</html>
