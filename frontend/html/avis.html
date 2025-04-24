@@ -12,11 +12,14 @@
         <div class="nav">
             <div class="logo">EFREI & DECOUVERTE</div>
             <nav>
-                <a href="index.html">ACCUEIL</a>
+                <a href="../index.html">ACCUEIL</a>
                 <a href="destinations.html">DESTINATIONS</a>
                 <a href="avis.html" class="active">AVIS</a>
                 <a href="forum.html">FORUM</a>
-                <a href="login.html">SE CONNECTER</a>
+                <span id="user-menu-container">
+                    <a href="login.html" id="user-menu-link" class="user-nav">SE CONNECTER</a>
+                    <div id="user-dropdown" class="dropdown-menu" style="display: none;"></div>
+                </span>
             </nav>
         </div>
     </header>
@@ -29,6 +32,7 @@
     <footer>
         <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
     </footer>
+    <script src="../js/connexion.js"></script>
     <script>
     fetch('http://localhost:3000/api/avis')
     .then(res => res.json())

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Accueil | EFREI & DECOUVERTE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700;500&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -16,7 +16,10 @@
                 <a href="html/destinations.html">DESTINATIONS</a>
                 <a href="html/avis.html">AVIS</a>
                 <a href="html/forums.html">FORUM</a>
-                <a href="#">SE CONNECTER</a>
+                <span id="user-menu-container">
+                    <a href="html/login.html" id="user-menu-link" class="user-nav">SE CONNECTER</a>
+                    <div id="user-dropdown" class="dropdown-menu" style="display: none;"></div>
+                </span>
             </nav>
         </div>
     </header>
@@ -61,7 +64,7 @@
         <p>© 2024 EFREI & DECOUVERTE. Projet étudiant - Tous droits réservés.</p>
     </footer>
 </main>
-
+<script src="js/connexion.js"></script>
 <script>
     let heroDisparu = false;
     const navbar = document.getElementById('navbar');

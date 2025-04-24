@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Poster un avis | EFREI & DECOUVERTE</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <header id="navbar">
+        <div class="nav">
+            <div class="logo">EFREI & DECOUVERTE</div>
+            <nav>
+                <a href="../index.html">ACCUEIL</a>
+                <a href="destinations.html">DESTINATIONS</a>
+                <a href="avis.html">AVIS</a>
+                <a href="forum.html">FORUM</a>
+                <span id="user-menu-container">
+                    <a href="login.html" id="user-menu-link" class="user-nav">SE CONNECTER</a>
+                    <div id="user-dropdown" class="dropdown-menu" style="display: none;"></div>
+                </span>
+            </nav>
+        </div>
+    </header>
+  <main>
+    <h2>Poster un avis</h2>
+    <form id="avis-form">
+      <label for="destination">Destination :</label>
+      <select id="destination" name="destination" required>
+        <option value="">Sélectionner une destination...</option>
+      </select>
+      <br><br>
+      <label for="type_mobilite">Type de mobilité :</label>
+      <select id="type_mobilite" name="type_mobilite" required>
+        <option value="">Sélectionner...</option>
+        <option value="I1">I1 - Semestre international</option>
+        <option value="I2">I2 - Stage en entreprise</option>
+        <option value="I3">I3 - Échange universitaire</option>
+        <option value="PEX">Mobilités Programme PEX</option>
+      </select>      
+      <br><br>
+      <label for="annee">Année :</label>
+      <input type="number" id="annee" name="annee" min="2000" max="2099" required>
+      <br><br>
+      <label for="commentaire">Commentaire :</label>
+      <textarea id="commentaire" name="commentaire" rows="4" required></textarea>
+      <br><br>
+      <fieldset>
+        <legend>Notes (sur 5) :</legend>
+        <label>Qualité des cours : <input type="number" name="qualite_cours" min="1" max="5" required></label><br>
+        <label>Logement : <input type="number" name="logement" min="1" max="5" required></label><br>
+        <label>Climat : <input type="number" name="climat" min="1" max="5" required></label><br>
+        <label>Vie locale : <input type="number" name="vie_locale" min="1" max="5" required></label><br>
+        <label>Accessibilité : <input type="number" name="accessibilite" min="1" max="5" required></label><br>
+      </fieldset>
+      <br>
+      <input type="submit" value="Poster l'avis">
+    </form>
+    <div id="avis-result"></div>
+    <section id="mes-avis-section" style="margin-top:50px;">
+        <h3>Mes avis précédents</h3>
+        <ul id="mes-avis-list">Chargement...</ul>
+      </section>
+  </main>
+  <script src="../js/connexion.js"></script>
+
+  <script>
+    // Vérifier que l'utilisateur est connecté
+    const id_utilisateur = localStorage.getItem('id_utilisateur');
+    if (!id_utilisateur) {
+      window.location.href = "login.html";
+    }
+
+    // Remplir le select des destinations
+    fetch('http://localhost:3000/api/destinations')
+      .then(res => res.json())
+      .then(destinations => {
+        const select = document.getElementById('destination');
+        destinations.forEach(dest => {
+          select.innerHTML += `<option value="${dest.id_destination}">${dest.universite} — ${dest.ville}, ${dest.pays}</option>`;
+        });
+      });
+
+    // Envoi du formulaire
+    document.getElementById('avis-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const data = {
+        id_utilisateur,
+        id_destination: form.destination.value,
+        code_type: form.type_mobilite.value,
+        annee_mobilite: form.annee.value,
+        commentaire: form.commentaire.value,
+        notes: {
+          qualite_cours: form.qualite_cours.value,
+          logement: form.logement.value,
+          climat: form.climat.value,
+          vie_locale: form.vie_locale.value,
+          accessibilite: form.accessibilite.value
+        }
+      };
+
+      fetch('http://localhost:3000/api/avis', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(result => {
+        document.getElementById('avis-result').textContent = result.success 
+          ? "Votre avis a bien été enregistré, merci !" 
+          : ("Erreur : " + (result.error || "Impossible d’enregistrer l’avis."));
+        if(result.success) form.reset();
+      })
+      .catch(() => {
+        document.getElementById('avis-result').textContent = "Erreur serveur, réessayez plus tard.";
+      });
+    });
+    // Charger les avis précédents de l'utilisateur
+    function chargerMesAvis() {
+    const id_utilisateur = localStorage.getItem('id_utilisateur');
+    if (!id_utilisateur) return;
+
+    fetch(`http://localhost:3000/api/mes-avis/${id_utilisateur}`)
+        .then(res => res.json())
+        .then(avisList => {
+        const ul = document.getElementById('mes-avis-list');
+        if (!avisList.length) {
+            ul.innerHTML = "<li>Aucun avis pour l’instant.</li>";
+            return;
+        }
+        ul.innerHTML = '';
+        avisList.forEach(avis => {
+            ul.innerHTML += `
+            <li style="margin-bottom:15px;">
+                <strong>${avis.universite}</strong> — ${avis.ville}, ${avis.pays}<br>
+                <span><em>${avis.code_type}</em> (${avis.annee_mobilite})</span><br>
+                <span>${avis.commentaire}</span><br>
+                <button class="supprimer-avis-btn" data-id="${avis.id_avis}">Supprimer</button>
+            </li>
+            `;
+        });
+
+        // Ajout listener pour tous les boutons supprimer
+        document.querySelectorAll('.supprimer-avis-btn').forEach(btn => {
+            btn.onclick = function() {
+            if (confirm("Supprimer cet avis ?")) {
+                fetch(`http://localhost:3000/api/avis/${btn.dataset.id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(result => {
+                    if(result.success) {
+                    btn.parentElement.remove();
+                    } else {
+                    alert("Erreur lors de la suppression.");
+                    }
+                });
+            }
+            };
+        });
+        });
+    }
+
+    // Appeler la fonction au chargement de la page
+    chargerMesAvis();
+  </script>
+</body>
+</html>
