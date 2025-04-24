@@ -45,3 +45,63 @@ database/
 
 README.md
 ```
+
+## Technologies utilisées
+
+- **Front-end :** HTML5, CSS3, JavaScript (Vanilla)
+- **Back-end :** Node.js, Express
+- **Base de données :** MySQL
+- **Déploiement :** Railway (Cloud) — compatible Vercel/Render
+- **Autres :** Vite (optionnel pour build front)
+
+---
+
+## Installation locale
+
+### 1. Cloner le dépôt
+
+```bash
+git clone https://github.com/votre-utilisateur/efrei-decouverte.git
+cd efrei-decouverte
+```
+
+### 2. Configurer la base de données MySQL
+
+- Importer **`BDD Efrei decouverte.sql`** dans votre MySQL.
+- (Optionnel) Importer **`Table de données.sql`** pour pré-remplir avec des exemples.
+
+---
+
+## 3. Back-end
+
+```bash
+cd backend
+npm install
+```
+
+Lancer l’API :
+
+```bash
+npm start
+```
+
+Le serveur tourne sur [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 4. Front-end
+
+Ouvrir `frontend/index.html`  
+
+---
+
+## 5. Équipe projet
+
+- LEE Zhuo Chan Stive
+- TEILLET Paul
+- SHANG Jacky
+- GERMANY Nathan
+
+---
+
+
