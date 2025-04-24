@@ -21,8 +21,6 @@ Projet Green IT – minimisation de l’empreinte carbone web.
 
 ## Architecture du projet
 
-## Architecture du projet
-
 ```
 backend/         # Node.js + Express (API)
 ├── app.js
