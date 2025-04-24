@@ -59,10 +59,12 @@
     <section id="mes-avis-section" style="margin-top:50px;">
         <h3>Mes avis précédents</h3>
         <ul id="mes-avis-list">Chargement...</ul>
-      </section>
+    </section>
   </main>
-  <script src="../js/connexion.js"></script>
+
+  <!-- Mets config.js AVANT tes autres scripts/appels ! -->
   <script src="../js/config.js"></script>
+  <script src="../js/connexion.js"></script>
   <script>
     // Vérifier que l'utilisateur est connecté
     const id_utilisateur = localStorage.getItem('id_utilisateur');
@@ -71,7 +73,7 @@
     }
 
     // Remplir le select des destinations
-    fetch('" + window.API_BASE_URL + "/api/destinations')
+    fetch(window.API_BASE_URL + "/api/destinations")
       .then(res => res.json())
       .then(destinations => {
         const select = document.getElementById('destination');
@@ -100,7 +102,7 @@
         }
       };
 
-      fetch('" + window.API_BASE_URL + "/api/avis', {
+      fetch(window.API_BASE_URL + "/api/avis", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -116,47 +118,48 @@
         document.getElementById('avis-result').textContent = "Erreur serveur, réessayez plus tard.";
       });
     });
+
     // Charger les avis précédents de l'utilisateur
     function chargerMesAvis() {
-    const id_utilisateur = localStorage.getItem('id_utilisateur');
-    if (!id_utilisateur) return;
+      const id_utilisateur = localStorage.getItem('id_utilisateur');
+      if (!id_utilisateur) return;
 
-    fetch(`" + window.API_BASE_URL + "/api/mes-avis/${id_utilisateur}`)
+      fetch(window.API_BASE_URL + "/api/mes-avis/" + id_utilisateur)
         .then(res => res.json())
         .then(avisList => {
-        const ul = document.getElementById('mes-avis-list');
-        if (!avisList.length) {
+          const ul = document.getElementById('mes-avis-list');
+          if (!avisList.length) {
             ul.innerHTML = "<li>Aucun avis pour l’instant.</li>";
             return;
-        }
-        ul.innerHTML = '';
-        avisList.forEach(avis => {
+          }
+          ul.innerHTML = '';
+          avisList.forEach(avis => {
             ul.innerHTML += `
-            <li style="margin-bottom:15px;">
-                <strong>${avis.universite}</strong> — ${avis.ville}, ${avis.pays}<br>
-                <span><em>${avis.code_type}</em> (${avis.annee_mobilite})</span><br>
-                <span>${avis.commentaire}</span><br>
-                <button class="supprimer-avis-btn" data-id="${avis.id_avis}">Supprimer</button>
-            </li>
+              <li style="margin-bottom:15px;">
+                  <strong>${avis.universite}</strong> — ${avis.ville}, ${avis.pays}<br>
+                  <span><em>${avis.code_type}</em> (${avis.annee_mobilite})</span><br>
+                  <span>${avis.commentaire}</span><br>
+                  <button class="supprimer-avis-btn" data-id="${avis.id_avis}">Supprimer</button>
+              </li>
             `;
-        });
+          });
 
-        // Ajout listener pour tous les boutons supprimer
-        document.querySelectorAll('.supprimer-avis-btn').forEach(btn => {
+          // Ajout listener pour tous les boutons supprimer
+          document.querySelectorAll('.supprimer-avis-btn').forEach(btn => {
             btn.onclick = function() {
-            if (confirm("Supprimer cet avis ?")) {
-                fetch(`" + window.API_BASE_URL + "/api/avis/${btn.dataset.id}`, { method: 'DELETE' })
+              if (confirm("Supprimer cet avis ?")) {
+                fetch(window.API_BASE_URL + "/api/avis/" + btn.dataset.id, { method: 'DELETE' })
                 .then(res => res.json())
                 .then(result => {
-                    if(result.success) {
+                  if(result.success) {
                     btn.parentElement.remove();
-                    } else {
+                  } else {
                     alert("Erreur lors de la suppression.");
-                    }
+                  }
                 });
-            }
+              }
             };
-        });
+          });
         });
     }
 

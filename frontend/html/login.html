@@ -43,8 +43,9 @@
     </div>
 </main>
 <footer>
-    <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
+    <p>© 2024 EFREI & DECOUVERTE. LEE Zhuo Chan Stive & TEILLET Paul & SHANG Jacky & GERMANY Nathan.</p>
 </footer>
+<script src="../js/config.js"></script>
 <script src="../js/connexion.js"></script>
 <script>
 const form = document.getElementById('login-form');
@@ -62,33 +63,31 @@ form.addEventListener('submit', function(e) {
         return;
     }
 
-    // Envoie la requête de connexion à ton back-end
-    fetch('http://localhost:3000/api/login', {
+    // Utilise la bonne URL selon l'env via config.js !
+    fetch(window.API_BASE_URL + '/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
     })
     .then(res => res.json())
     .then(data => {
-    if (data.success) {
-        // Stocker les infos utilisateur AVANT de rediriger
-        localStorage.setItem('nom', data.nom);
-        localStorage.setItem('prenom', data.prenom);
-        localStorage.setItem('id_role', data.id_role); // Utilise bien id_role (côté back) !
-        localStorage.setItem('id_utilisateur', data.id_utilisateur);
-        window.location.href = "../index.html"; // Redirection APRÈS stockage
-    } else {
-        errorDiv.textContent = data.error || "Identifiants incorrects";
-        errorDiv.style.display = "block";
-    }
+        if (data.success) {
+            // Stocker les infos utilisateur AVANT de rediriger
+            localStorage.setItem('nom', data.nom);
+            localStorage.setItem('prenom', data.prenom);
+            localStorage.setItem('id_role', data.id_role); // Utilise bien id_role (côté back) !
+            localStorage.setItem('id_utilisateur', data.id_utilisateur);
+            window.location.href = "../index.html"; // Redirection APRÈS stockage
+        } else {
+            errorDiv.textContent = data.error || "Identifiants incorrects";
+            errorDiv.style.display = "block";
+        }
     })
     .catch(() => {
         errorDiv.textContent = "Erreur de connexion au serveur.";
         errorDiv.style.display = "block";
     });
 });
-
-
 </script>
 </body>
 </html>

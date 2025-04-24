@@ -27,7 +27,7 @@
     <h2>Mes Favoris</h2>
     <ul id="favoris-list">Chargement...</ul>
   </main>
-
+  <script src="../js/config.js"></script>
   <script src="../js/connexion.js"></script>
   <script>
     // Vérifier que l'utilisateur est connecté
@@ -36,7 +36,7 @@
       window.location.href = "login.html";
     }
 
-    fetch(`http://localhost:3000/api/favoris/${idUtilisateur}`)
+    fetch(`${window.API_BASE_URL}/api/favoris/${idUtilisateur}`)
       .then(res => res.json())
       .then(favoris => {
         const ul = document.getElementById('favoris-list');

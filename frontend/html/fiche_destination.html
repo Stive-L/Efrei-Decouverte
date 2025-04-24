@@ -40,13 +40,14 @@
   <script src="../js/connexion.js"></script>
   <!-- Script commun pour likes/signalements -->
   <script src="../js/avis_actions.js"></script>
+  <script src="../js/config.js"></script>
   <script>
     // ------ CHARGEMENT DE LA DESTINATION ET AVIS ------
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
     if (id) {
-      fetch(`http://localhost:3000/api/destinations/${id}`)
+      fetch(`${window.API_BASE_URL}/api/destinations/${id}`)
         .then(res => {
           if (!res.ok) throw new Error("HTTP error " + res.status);
           return res.json();

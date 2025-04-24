@@ -31,6 +31,7 @@
     <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
   </footer>
   <script src="../js/connexion.js"></script>
+  <script src="../js/config.js"></script>
   <script>
     // Vérifier admin
     const userRole = localStorage.getItem('id_role');
@@ -44,7 +45,7 @@
     }
 
     // Charger les avis signalés
-    fetch('http://localhost:3000/api/signalements')
+    fetch(window.API_BASE_URL + '/api/signalements')
       .then(res => res.json())
       .then(list => {
         const div = document.getElementById('signalements-list');
@@ -82,7 +83,7 @@
     // Actions admin
     function validerSignalement(id_signalement, id_avis) {
       if (!confirm("Supprimer cet avis ?")) return;
-      fetch('http://localhost:3000/api/admin/signalement/valider', {
+      fetch(window.API_BASE_URL + '/api/admin/signalement/valider', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ id_signalement, id_avis })
@@ -96,7 +97,7 @@
 
     function ignorerSignalement(id_signalement) {
       if (!confirm("Ignorer ce signalement ?")) return;
-      fetch('http://localhost:3000/api/admin/signalement/ignorer', {
+      fetch(window.API_BASE_URL + '/api/admin/signalement/ignorer', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ id_signalement })
