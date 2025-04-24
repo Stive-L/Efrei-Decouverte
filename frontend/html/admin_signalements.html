@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Avis signalés | EFREI & DECOUVERTE</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="logo">EFREI & DECOUVERTE</div>
+      <nav>
+        <a href="../index.html">ACCUEIL</a>
+        <a href="destinations.html">DESTINATIONS</a>
+        <a href="avis.html">AVIS</a>
+        <a href="forum.html">FORUM</a>
+        <span id="user-menu-container">
+            <a href="login.html" id="user-menu-link" class="user-nav">SE CONNECTER</a>
+            <div id="user-dropdown" class="dropdown-menu" style="display:none"></div>
+        </span>          
+      </nav>
+    </div>
+  </header>
+  <main>
+    <h2>Signalements d'avis</h2>
+    <div id="signalements-list">
+      Chargement...
+    </div>
+  </main>
+  <footer>
+    <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
+  </footer>
+  <script src="../js/connexion.js"></script>
+  <script>
+    // Vérifier admin
+    const userRole = localStorage.getItem('id_role');
+    const nom = localStorage.getItem('nom');
+    const prenom = localStorage.getItem('prenom');
+
+    // Sécurité (redirige si pas admin)
+    if (userRole !== "1") {
+        alert("Accès réservé à l'admin.");
+        window.location.href = "login.html";
+    }
+
+    // Charger les avis signalés
+    fetch('http://localhost:3000/api/signalements')
+      .then(res => res.json())
+      .then(list => {
+        const div = document.getElementById('signalements-list');
+        if (!Array.isArray(list) || !list.length) {
+          div.innerHTML = "<p>Aucun signalement en attente.</p>";
+          return;
+        }
+        div.innerHTML = `
+          <table>
+            <tr>
+              <th>Date</th><th>Avis</th><th>Motif</th><th>Statut</th><th>Actions</th>
+            </tr>
+            ${list.map(sig => `
+              <tr>
+                <td>${new Date(sig.date_signalement).toLocaleString('fr-FR')}</td>
+                <td>
+                  <b>${sig.prenom} ${sig.nom}</b><br>
+                  ${sig.commentaire}<br>
+                  <i>${sig.universite}, ${sig.ville}, ${sig.pays}</i>
+                </td>
+                <td>${sig.motif}</td>
+                <td>${sig.statut}</td>
+                <td>
+                  ${sig.statut === 'en_attente' ? `
+                    <button onclick="validerSignalement(${sig.id_signalement}, ${sig.id_avis})">Supprimer</button>
+                    <button onclick="ignorerSignalement(${sig.id_signalement})">Ignorer</button>
+                  ` : '<i>Trait&eacute;</i>'}
+                </td>
+              </tr>
+            `).join('')}
+          </table>
+        `;
+      });
+
+    // Actions admin
+    function validerSignalement(id_signalement, id_avis) {
+      if (!confirm("Supprimer cet avis ?")) return;
+      fetch('http://localhost:3000/api/admin/signalement/valider', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id_signalement, id_avis })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) location.reload();
+        else alert(res.error || "Erreur serveur.");
+      });
+    }
+
+    function ignorerSignalement(id_signalement) {
+      if (!confirm("Ignorer ce signalement ?")) return;
+      fetch('http://localhost:3000/api/admin/signalement/ignorer', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id_signalement })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) location.reload();
+        else alert(res.error || "Erreur serveur.");
+      });
+    }
+  </script>
+</body>
+</html>

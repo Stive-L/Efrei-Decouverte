@@ -32,17 +32,17 @@ INSERT INTO Destination (
   empreinte_carbone,
   nombre_etudiants
 ) VALUES
-  ('Canada',            'Concordia University',                        'Montréal',      'Anglais',           950.00, 'https://www.concordia.ca/',                       780.50, 50000),
+  ('Canada',            'Concordia University',                        'Montréal',      'Anglais',           6850.00, 'https://www.concordia.ca/',                       780.50, 50000),
   ('Afrique du Sud',    'Cape Peninsula University of Technology',    'Cape Town',     'Anglais',           600.00, 'http://www.cput.ac.za/',                          1420.00, 35000),
   ('Royaume-Uni',       'Staffordshire University',                    'Stoke-on-Trent','Anglais',          1200.00, 'https://www.staffs.ac.uk/',                        2000.00, 19000),
-  ('Malaisie',          'Asia Pacific University (APU)',               'Kuala Lumpur',  'Anglais',           600.00, 'https://www.apu.edu.my/',                          1584.00, 15000),
+  ('Malaisie',          'Asia Pacific University (APU)',               'Kuala Lumpur',  'Anglais',           3200.00, 'https://www.apu.edu.my/',                          1584.00, 15000),
   ('Pologne',           'AGH University of Science and Technology',    'Kraków',        'Polonais/Anglais',  700.00, 'https://www.agh.edu.pl/',                          239.00,  18000),
-  ('États-Unis',        'University of California, Irvine (UCI)',      'Irvine',        'Anglais',          1500.00, 'https://www.uci.edu',                              1382.00, 38000),
-  ('Canada',            'International Language Academy of Canada',    'Toronto',       'Anglais',           900.00, 'https://www.ilac.com/',                            912.00,  14000),
-  ('Hongrie',           'ESSCA School of Management',                  'Budapest',      'Anglais',           800.00, 'https://www.essca.eu/',                            233.00,   7000),
-  ('République tchèque','Technical University of Ostrava (VSB-TUO)', 'Ostrava',       'Tchèque/Anglais',   550.00, 'https://www.vsb.cz/en/',                           217.00,  22500),
+  ('États-Unis',        'University of California, Irvine (UCI)',      'Irvine',        'Anglais',          11000.00, 'https://www.uci.edu',                              1382.00, 38000),
+  ('Canada',            'International Language Academy of Canada',    'Toronto',       'Anglais',           5000.00, 'https://www.ilac.com/',                            912.00,  14000),
+  ('Hongrie',           'ESSCA School of Management',                  'Budapest',      'Anglais',          4800.00, 'https://www.essca.eu/',                            233.00,   7000),
+  ('République tchèque','Technical University of Ostrava (VSB-TUO)', 'Ostrava',       'Tchèque/Anglais',   3200.00, 'https://www.vsb.cz/en/',                           217.00,  22500),
   ('Chine',             'Southeastern University (SEU)',               'Jiangsu',       'Chinois/Anglais',   650.00, 'http://www.seu.edu.cn/',                          1374.00, 31000),
-  ('Inde',              'Manipal Academy of Higher Education',         'Manipal',       'Anglais',           400.00, 'http://www.manipal.edu',                          1157.00, 30000);
+  ('Inde',              'Manipal Academy of Higher Education',         'Manipal',       'Anglais',           3700.00, 'http://www.manipal.edu',                          1157.00, 30000);
 
 -- 4. Utilisateurs
 INSERT INTO Utilisateur (
@@ -135,6 +135,8 @@ INSERT INTO ForumDestination (id_utilisateur, id_destination, contenu) VALUES
   (2, 1, 'Le quartier Plateau est sympa et plus abordable.'),
   (3, 3, 'Quel est le meilleur moyen de transport à Stoke-on-Trent ?');
 
+INSERT INTO forum_reponse (id_message, id_utilisateur, contenu)
+VALUES (1, 2, 'Salut ! Pour le logement à Montréal, regarde du côté des résidences universitaires ou des groupes Facebook dédiés.');
 
 
 -- Vérifier le contenu de la table

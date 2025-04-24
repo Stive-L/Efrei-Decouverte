@@ -318,12 +318,199 @@ app.get('/api/avis/:id_avis/likes', (req, res) => {
   );
 });
 
+app.post('/api/avis/signaler', (req, res) => {
+  const { id_avis, id_utilisateur, motif } = req.body;
+  if (!id_avis || !id_utilisateur || !motif) {
+    return res.status(400).json({ success: false, error: "Données manquantes." });
+  }
+  db.query(
+    `INSERT INTO signalementavis (id_avis, id_utilisateur, motif, statut, date_signalement)
+     VALUES (?, ?, ?, 'en_attente', NOW())`,
+    [id_avis, id_utilisateur, motif],
+    (err) => {
+      if (err) return res.status(500).json({ success: false, error: "Erreur MySQL" });
+      res.json({ success: true });
+    }
+  );
+});
 
-// ==========================
-//   ROUTES ADMIN (EXEMPLES)
-//   (admin.html, ajouter_destination.html, etc.)
-// ==========================
-// !! À compléter pour les routes admin plus tard !!
+
+app.get('/api/forum', (req, res) => {
+  db.query(
+    `SELECT f.*, d.universite, d.ville, d.pays, u.prenom, u.nom
+     FROM forumdestination f
+     LEFT JOIN Destination d ON f.id_destination = d.id_destination
+     LEFT JOIN Utilisateur u ON f.id_utilisateur = u.id_utilisateur
+     ORDER BY f.date_message DESC`,
+    (err, rows) => {
+      if (err) {
+        console.error('Erreur /api/forum :', err);
+        return res.status(500).json({ error: 'Erreur serveur forum' });
+      }
+      res.json(rows);
+    }
+  );
+});
+
+app.post('/api/forum', (req, res) => {
+  const { id_utilisateur, id_destination, contenu } = req.body;
+  if (!id_utilisateur || !id_destination || !contenu) {
+    return res.status(400).json({ error: "Champs manquants" });
+  }
+  db.query(
+    "INSERT INTO forumdestination (id_utilisateur, id_destination, contenu, date_message) VALUES (?, ?, ?, NOW())",
+    [id_utilisateur, id_destination, contenu],
+    (err) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({error: "Erreur serveur"});
+      }
+      res.json({ success: true });
+    }
+  );
+});
+
+app.get('/api/forum/:id_message/reponses', (req, res) => {
+  const id = req.params.id_message;
+  db.query(`
+    SELECT r.*, u.prenom, u.nom
+    FROM forum_reponse r
+    JOIN utilisateur u ON r.id_utilisateur = u.id_utilisateur
+    WHERE r.id_message = ?
+    ORDER BY r.date_reponse ASC
+  `, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+    res.json(results);
+  });
+});
+
+app.post('/api/forum/:id_message/reponses', (req, res) => {
+  const { id_utilisateur, contenu } = req.body;
+  const id_message = req.params.id_message;
+  if (!id_utilisateur || !contenu) {
+    return res.status(400).json({ error: "Champs manquants" });
+  }
+  db.query(
+    "INSERT INTO forum_reponse (id_message, id_utilisateur, contenu) VALUES (?, ?, ?)",
+    [id_message, id_utilisateur, contenu],
+    (err) => {
+      if (err) return res.status(500).json({ error: "Erreur MySQL" });
+      res.json({ success: true });
+    }
+  );
+});
+
+app.delete('/api/forum/:id_message', (req, res) => {
+  const id_message = req.params.id_message;
+  const id_utilisateur = req.body.id_utilisateur; // doit être envoyé côté client
+  // On vérifie si l'utilisateur est l'auteur
+  db.query(
+    'SELECT * FROM forumdestination WHERE id_message = ? AND id_utilisateur = ?',
+    [id_message, id_utilisateur],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+      if (results.length === 0)
+        return res.status(403).json({ error: 'Action non autorisée' });
+      // Supprime d'abord les réponses associées
+      db.query('DELETE FROM forum_reponse WHERE id_message = ?', [id_message], () => {
+        // Puis supprime le message principal
+        db.query('DELETE FROM forumdestination WHERE id_message = ?', [id_message], (err2) => {
+          if (err2) return res.status(500).json({ error: 'Erreur MySQL' });
+          res.json({ success: true });
+        });
+      });
+    }
+  );
+});
+
+app.delete('/api/forum/reponse/:id_reponse', (req, res) => {
+  const id_reponse = req.params.id_reponse;
+  const id_utilisateur = req.body.id_utilisateur;
+  // Vérifie si l'utilisateur est l'auteur de la réponse
+  db.query(
+    'SELECT * FROM forum_reponse WHERE id_reponse = ? AND id_utilisateur = ?',
+    [id_reponse, id_utilisateur],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+      if (results.length === 0)
+        return res.status(403).json({ error: 'Action non autorisée' });
+      db.query('DELETE FROM forum_reponse WHERE id_reponse = ?', [id_reponse], (err2) => {
+        if (err2) return res.status(500).json({ error: 'Erreur MySQL' });
+        res.json({ success: true });
+      });
+    }
+  );
+});
+
+// Récupérer tous les avis signalés (pour admin)
+app.get('/api/signalements', (req, res) => {
+  const sql = `
+    SELECT s.*, a.commentaire, a.id_avis, u.prenom, u.nom, d.universite, d.ville, d.pays
+    FROM signalementavis s
+    JOIN avis a ON s.id_avis = a.id_avis
+    JOIN utilisateur u ON a.id_utilisateur = u.id_utilisateur
+    JOIN destination d ON a.id_destination = d.id_destination
+    ORDER BY s.date_signalement DESC
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return res.status(500).json({error: "Erreur MySQL"});
+    res.json(results);
+  });
+});
+
+// Valider un signalement (supprimer l'avis et marquer traité)
+app.post('/api/admin/signalement/valider', (req, res) => {
+  const { id_signalement, id_avis } = req.body;
+  // Suppression de l'avis + update du signalement
+  db.query("DELETE FROM avis WHERE id_avis = ?", [id_avis], (err) => {
+    if (err) return res.status(500).json({ success: false, error: "Erreur suppression avis" });
+    db.query("UPDATE signalementavis SET statut = 'traite' WHERE id_signalement = ?", [id_signalement], (err2) => {
+      if (err2) return res.status(500).json({ success: false, error: "Erreur statut signalement" });
+      res.json({ success: true });
+    });
+  });
+});
+
+// Ignorer un signalement (marquer traité mais garder l'avis)
+app.post('/api/admin/signalement/ignorer', (req, res) => {
+  const { id_signalement } = req.body;
+  db.query("UPDATE signalementavis SET statut = 'traite' WHERE id_signalement = ?", [id_signalement], (err) => {
+    if (err) return res.status(500).json({ success: false, error: "Erreur statut signalement" });
+    res.json({ success: true });
+  });
+});
+
+
+
+
+// === Ajout d’une nouvelle destination ===
+app.post('/api/destinations', (req, res) => {
+  const { pays, universite, ville, langue, cout_vie_moyen,
+          url_universite, empreinte_carbone, nombre_etudiants } = req.body;
+  // validation basique...
+  if (!pays || !universite || !ville || !langue || cout_vie_moyen == null || !url_universite) {
+    return res.status(400).json({ success:false, error:"Champs manquants" });
+  }
+  const sql = `
+    INSERT INTO Destination
+    (pays, universite, ville, langue, cout_vie_moyen, url_universite, empreinte_carbone, nombre_etudiants)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  db.query(sql, [
+    pays, universite, ville, langue, cout_vie_moyen,
+    url_universite, empreinte_carbone, nombre_etudiants
+  ], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ success:false, error:"Erreur MySQL" });
+    }
+    res.json({ success:true, id_destination: result.insertId });
+  });
+});
+
+
+
+
 
 
 // ==========================

@@ -4,7 +4,7 @@ window.addEventListener('DOMContentLoaded', function() {
     const dropdown = document.getElementById('user-dropdown');
     const nom = localStorage.getItem('nom');
     const prenom = localStorage.getItem('prenom');
-    const role = localStorage.getItem('role'); // 1 = Admin
+    const role = localStorage.getItem('id_role'); 
 
     // Fonction pour obtenir le bon chemin selon la page courante
     function linkTo(page) {
@@ -25,9 +25,11 @@ window.addEventListener('DOMContentLoaded', function() {
             `;
         } else {
             menuHtml += `
-                <a href="#" id="logout-link">Déconnexion</a>
+                <a href="${linkTo('favoris.html')}">Consulter les favoris</a>
+                <a href="${linkTo('poster_avis.html')}">Poster un avis</a>
                 <a href="${linkTo('admin_signalements.html')}">Avis signalés</a>
                 <a href="${linkTo('ajouter_destination.html')}">Ajouter une destination</a>
+                <a href="#" id="logout-link">Déconnexion</a>
             `;
         }
         dropdown.innerHTML = menuHtml;

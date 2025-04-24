@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Ajouter une destination | EFREI & DECOUVERTE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    main { max-width:600px; margin:80px auto 40px; padding:0 1rem; }
+    label { display:block; margin-top:1rem; font-weight:600; }
+    input, textarea { width:100%; padding:8px; margin-top:4px; box-sizing:border-box; }
+    input[type="submit"] { margin-top:1.5rem; background:#62b36e; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+    input[type="submit"]:hover { background:#3d8242; }
+    #form-result { margin-top:1rem; font-style:italic; color:#a22; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="logo">EFREI &amp; DÉCOUVERTE</div>
+      <nav>
+        <a href="../index.html">ACCUEIL</a>
+        <a href="destinations.html">DESTINATIONS</a>
+        <a href="avis.html">AVIS</a>
+        <a href="forum.html">FORUM</a>
+        <!-- menu injecté par connexion.js -->
+        <span id="user-menu-container">
+          <a href="#" id="user-menu-link" class="user-nav">SE CONNECTER</a>
+          <div id="user-dropdown" class="dropdown-menu" style="display:none"></div>
+        </span>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <h2>Ajouter une nouvelle destination</h2>
+    <form id="add-destination-form">
+      <label for="pays">Pays :</label>
+      <input type="text" id="pays" name="pays" required>
+
+      <label for="universite">Université :</label>
+      <input type="text" id="universite" name="universite" required>
+
+      <label for="ville">Ville :</label>
+      <input type="text" id="ville" name="ville" required>
+
+      <label for="langue">Langue(s) d’enseignement :</label>
+      <input type="text" id="langue" name="langue" required>
+
+      <label for="cout_vie_moyen">Coût de la vie moyen (€) :</label>
+      <input type="number" step="0.01" id="cout_vie_moyen" name="cout_vie_moyen" required>
+
+      <label for="url_universite">Site web de l’université :</label>
+      <input type="url" id="url_universite" name="url_universite" placeholder="https://..." required>
+
+      <label for="empreinte_carbone">Empreinte carbone (kg CO₂) :</label>
+      <input type="number" step="0.01" id="empreinte_carbone" name="empreinte_carbone">
+
+      <label for="nombre_etudiants">Nombre d’étudiants :</label>
+      <input type="number" id="nombre_etudiants" name="nombre_etudiants">
+
+      <input type="submit" value="Ajouter la destination">
+    </form>
+    <div id="form-result"></div>
+  </main>
+
+  <footer>
+    <p>© 2024 EFREI &amp; DÉCOUVERTE. Projet étudiant.</p>
+  </footer>
+
+  <!-- Menu utilisateur / admin -->
+  <script src="../js/connexion.js"></script>
+  <script>
+    // --- Sécurité : seuls les admins (role="1") peuvent accéder ---
+    if (localStorage.getItem('id_role') !== "1") {
+      alert("Accès réservé à l'admin.");
+      window.location.href = "login.html";
+    }
+
+    const form       = document.getElementById('add-destination-form');
+    const resultDiv  = document.getElementById('form-result');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      resultDiv.textContent = "";
+
+      // Récupère et nettoie les valeurs
+      const data = {
+        pays:               form.pays.value.trim(),
+        universite:         form.universite.value.trim(),
+        ville:              form.ville.value.trim(),
+        langue:             form.langue.value.trim(),
+        cout_vie_moyen:     parseFloat(form.cout_vie_moyen.value),
+        url_universite:     form.url_universite.value.trim(),
+        empreinte_carbone:  form.empreinte_carbone.value ? parseFloat(form.empreinte_carbone.value) : null,
+        nombre_etudiants:   form.nombre_etudiants.value ? parseInt(form.nombre_etudiants.value) : null
+      };
+
+      // Vérif. simple
+      if (!data.pays || !data.universite || !data.ville || !data.langue || isNaN(data.cout_vie_moyen) || !data.url_universite) {
+        resultDiv.textContent = "Merci de remplir tous les champs obligatoires.";
+        return;
+      }
+
+      // Envoi au back
+      fetch('http://localhost:3000/api/destinations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(r => r.json())
+      .then(res => {
+        if (res.success) {
+          resultDiv.style.color = '#21743a';
+          resultDiv.textContent = "✔️ Destination ajoutée avec succès !";
+          form.reset();
+        } else {
+          throw new Error(res.error || 'Erreur serveur');
+        }
+      })
+      .catch(err => {
+        resultDiv.style.color = '#a22';
+        resultDiv.textContent = "❌ " + err.message;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -185,6 +185,16 @@ CREATE TABLE ForumDestination (
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Espace de discussion par destination';
 
+CREATE TABLE forum_reponse (
+  id_reponse INT AUTO_INCREMENT PRIMARY KEY,
+  id_message BIGINT UNSIGNED NOT NULL,
+  id_utilisateur BIGINT UNSIGNED NOT NULL,
+  contenu TEXT NOT NULL,
+  date_reponse DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (id_message) REFERENCES forumdestination(id_message),
+  FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Réponses aux forums';
+
 -- Table des statistiques écologiques et d’activité du site
 CREATE TABLE StatistiquesEco (
   id_stat INT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'Identifiant statistique',

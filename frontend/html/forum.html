@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Forum | EFREI & DECOUVERTE</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header id="navbar">
+    <div class="nav">
+      <div class="logo">EFREI & DECOUVERTE</div>
+      <nav>
+        <a href="../index.html">ACCUEIL</a>
+        <a href="destinations.html">DESTINATIONS</a>
+        <a href="avis.html">AVIS</a>
+        <a href="forum.html" class="active">FORUM</a>
+        <span id="user-menu-container">
+          <a href="login.html" id="user-menu-link" class="user-nav">SE CONNECTER</a>
+          <div id="user-dropdown" class="dropdown-menu" style="display: none;"></div>
+        </span>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <h2>Forum des destinations</h2>
+    <div id="forum-messages">
+      Chargement des messages...
+    </div>
+    <div id="forum-form-section" style="margin-top: 35px;">
+      <h3>Poster un nouveau message</h3>
+      <form id="forum-form">
+        <label for="destination">Destination :</label>
+        <select id="destination" name="destination" required>
+          <option value="">Sélectionner une destination...</option>
+        </select>
+        <br><br>
+        <label for="contenu">Message :</label>
+        <textarea id="contenu" name="contenu" rows="3" required></textarea>
+        <br>
+        <button type="submit">Poster le message</button>
+      </form>
+      <div id="forum-form-result"></div>
+    </div>
+  </main>
+  <footer>
+    <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
+  </footer>
+  <script src="../js/connexion.js"></script>
+  <script>
+    const id_utilisateur = localStorage.getItem('id_utilisateur');
+
+    // Remplir la liste des destinations
+    fetch('http://localhost:3000/api/destinations')
+      .then(res => res.json())
+      .then(destinations => {
+        if (!Array.isArray(destinations)) {
+          document.getElementById('destination').innerHTML = '<option value="">Erreur destinations</option>';
+          return;
+        }
+        const select = document.getElementById('destination');
+        destinations.forEach(dest => {
+          select.innerHTML += `<option value="${dest.id_destination}">${dest.universite} — ${dest.ville}, ${dest.pays}</option>`;
+        });
+      })
+      .catch(() => {
+        document.getElementById('destination').innerHTML = '<option value="">Erreur de chargement</option>';
+      });
+
+    // Récupérer toutes les réponses pour chaque message (forum)
+    async function getReponses(id_message) {
+      try {
+        const res = await fetch(`http://localhost:3000/api/forum/${id_message}/reponses`);
+        if (!res.ok) return [];
+        return await res.json();
+      } catch {
+        return [];
+      }
+    }
+
+    // Affichage forum avec réponses imbriquées + bouton pour répondre
+    async function chargerForum() {
+      fetch('http://localhost:3000/api/forum')
+        .then(res => res.json())
+        .then(async messages => {
+          const div = document.getElementById('forum-messages');
+          if (!Array.isArray(messages)) {
+            div.innerHTML = "<p>Erreur serveur forum.</p>";
+            return;
+          }
+          if (!messages.length) {
+            div.innerHTML = "<p>Aucun message pour l’instant.</p>";
+            return;
+          }
+
+          let html = '<ul class="forum-list">';
+          for (const msg of messages) {
+            // Récupérer les réponses
+            const reponses = await getReponses(msg.id_message);
+            html += `
+              <li class="forum-message" style="margin-bottom:30px;">
+                <div>
+                  <b>${msg.prenom} ${msg.nom}</b> — <span style="color:#888">${new Date(msg.date_message).toLocaleDateString('fr-FR')}</span>
+                  ${
+                    msg.id_utilisateur == id_utilisateur
+                      ? `<button onclick="supprimerMessage(${msg.id_message})" style="color:#a22;margin-left:12px;">Supprimer</button>`
+                      : ''
+                  }
+                </div>
+                <div><i>${msg.universite}, ${msg.ville}, ${msg.pays}</i></div>
+                <div style="margin-top:4px">${msg.contenu}</div>
+                <div>
+                  <button class="repondre-btn" data-id="${msg.id_message}">Répondre</button>
+                </div>
+                <ul class="forum-reponses" style="margin-top:8px;">
+                  ${
+                    reponses.length ?
+                    reponses.map(rep => `
+                        <li style="margin-bottom:8px;padding-left:12px;border-left:2px solid #e0e0e0;">
+                          <b>${rep.prenom} ${rep.nom}</b> — <span style="color:#aaa">${new Date(rep.date_reponse).toLocaleDateString('fr-FR')}</span>
+                          ${
+                            rep.id_utilisateur == id_utilisateur
+                              ? `<button onclick="supprimerReponse(${rep.id_reponse})" style="color:#a22;margin-left:8px;">Supprimer</button>`
+                              : ''
+                          }
+                          <br>
+                          <span>${rep.contenu}</span>
+                        </li>
+                      `).join('') :
+                    `<li style="color:#aaa;">Aucune réponse pour l’instant.</li>`
+                  }
+                </ul>
+                <form class="reponse-form" data-id="${msg.id_message}" style="display:none; margin-top:10px;">
+                  <textarea name="contenu" rows="2" placeholder="Votre réponse..." required style="width:100%;"></textarea>
+                  <button type="submit" style="margin-top:3px;">Envoyer</button>
+                </form>
+              </li>
+            `;
+          }
+          html += '</ul>';
+          div.innerHTML = html;
+
+          // Gérer affichage des formulaires de réponse
+          document.querySelectorAll('.repondre-btn').forEach(btn => {
+            btn.onclick = function() {
+              // Masque tous les autres forms
+              document.querySelectorAll('.reponse-form').forEach(f => f.style.display = "none");
+              // Affiche le form du bon message
+              const form = document.querySelector(`.reponse-form[data-id="${btn.dataset.id}"]`);
+              if (form) form.style.display = "block";
+            };
+          });
+
+          // Gestion soumission d’une réponse
+          document.querySelectorAll('.reponse-form').forEach(form => {
+            form.onsubmit = function(e) {
+              e.preventDefault();
+              if (!id_utilisateur) {
+                alert("Connecte-toi pour répondre !");
+                return;
+              }
+              const id_message = form.getAttribute('data-id');
+              const contenu = form.contenu.value;
+              fetch(`http://localhost:3000/api/forum/${id_message}/reponses`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ id_utilisateur, contenu })
+                })
+                .then(res => res.json())
+                .then(result => {
+                  if (result.success) {
+                    form.reset();
+                    chargerForum();
+                  } else {
+                    alert("Erreur lors de l’envoi.");
+                  }
+                });
+            };
+          });
+        })
+        .catch(() => {
+          document.getElementById('forum-messages').innerHTML = "<p>Erreur serveur forum.</p>";
+        });
+    }
+    chargerForum();
+
+    // Formulaire d'envoi (nouveau message/question)
+    document.getElementById('forum-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (!id_utilisateur) {
+        alert("Connecte-toi pour poster sur le forum !");
+        return;
+      }
+      const form = e.target;
+      const data = {
+        id_utilisateur,
+        id_destination: form.destination.value,
+        contenu: form.contenu.value
+      };
+      fetch('http://localhost:3000/api/forum', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(result => {
+        document.getElementById('forum-form-result').textContent = result.success
+          ? "Message posté !"
+          : ("Erreur : " + (result.error || "Impossible de poster."));
+        if (result.success) {
+          form.reset();
+          chargerForum();
+        }
+      })
+      .catch(() => {
+        document.getElementById('forum-form-result').textContent = "Erreur lors de l'envoi.";
+      });
+    });
+
+    // Masquer le formulaire si non connecté
+    if (!id_utilisateur) {
+      document.getElementById('forum-form-section').style.display = "none";
+    }
+
+    function supprimerMessage(id_message) {
+      const id_utilisateur = localStorage.getItem('id_utilisateur');
+      if (!confirm('Supprimer ce message ?')) return;
+      fetch(`http://localhost:3000/api/forum/${id_message}`, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id_utilisateur })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.success) chargerForum();
+        else alert(data.error || "Erreur suppression");
+      });
+    }
+
+    function supprimerReponse(id_reponse) {
+      const id_utilisateur = localStorage.getItem('id_utilisateur');
+      if (!confirm('Supprimer cette réponse ?')) return;
+      fetch(`http://localhost:3000/api/forum/reponse/${id_reponse}`, {
+        method: 'DELETE',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id_utilisateur })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.success) chargerForum();
+        else alert(data.error || "Erreur suppression");
+      });
+    }
+  </script>
+</body>
+</html>

@@ -74,7 +74,7 @@ form.addEventListener('submit', function(e) {
         // Stocker les infos utilisateur AVANT de rediriger
         localStorage.setItem('nom', data.nom);
         localStorage.setItem('prenom', data.prenom);
-        localStorage.setItem('role', data.id_role); // Utilise bien id_role (côté back) !
+        localStorage.setItem('id_role', data.id_role); // Utilise bien id_role (côté back) !
         localStorage.setItem('id_utilisateur', data.id_utilisateur);
         window.location.href = "../index.html"; // Redirection APRÈS stockage
     } else {
