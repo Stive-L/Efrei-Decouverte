@@ -68,9 +68,9 @@ cd efrei-decouverte
 ### 2. Configurer la base de données MySQL
 
 - Importer **`BDD Efrei decouverte.sql`** dans votre MySQL.
-- (Optionnel) Importer **`Table de données.sql`** pour pré-remplir avec des exemples.
+- Importer **`Table de données.sql`** pour pré-remplir avec des exemples.
 
----
+
 
 ### 3. Back-end
 
@@ -87,7 +87,7 @@ npm start
 
 Le serveur tourne sur [http://localhost:3000](http://localhost:3000)
 
----
+
 
 ### 4. Front-end
 
