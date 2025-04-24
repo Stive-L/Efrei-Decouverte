@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Découvrez l'Inde et Manipal</title>
+  <style>
+    /* Dégradé Inde : safran - blanc - vert */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: #333;
+      background: linear-gradient(to bottom, #FF9933 0%, #FFFFFF 50%, #138808 100%);
+    }
+    /* Bouton d'accueil */
+    .home-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: #ffffff;
+      color: #FF9933;
+      border: 2px solid #FF9933;
+      padding: 0.5em 1em;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 4px;
+      transition: background-color 0.3s, color 0.3s;
+      z-index: 10;
+    }
+    .home-button:hover {
+      background-color: #FF9933;
+      color: #ffffff;
+    }
+    /* En-tête */
+    header {
+      background: url('https://example.com/manipal-header.jpg') center/cover no-repeat;
+      height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #138808;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+      position: relative;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,153,51,0.4);
+    }
+    header h1 {
+      font-size: 3em;
+      margin: 0;
+      z-index: 1;
+      animation: fadeInDown 1.5s ease-out;
+    }
+
+    /* Sections animées */
+    section {
+      padding: 2em;
+      max-width: 800px;
+      margin: auto;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    section.active {
+      opacity: 1;
+      transform: none;
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    h2 {
+      border-bottom: 3px solid #138808;
+      padding-bottom: 0.5em;
+      color: #138808;
+    }
+
+    /* Cartes de lieux */
+    .places {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1em;
+    }
+    .place-card {
+      background: #fff;
+      border: none;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      transition: transform 0.3s;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .place-card.active {
+      opacity: 1;
+      transform: none;
+    }
+    .place-card:hover {
+      transform: translateY(-5px);
+    }
+    .place-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .place-card h3 {
+      margin: 0.5em;
+      font-size: 1.2em;
+      color: #FF9933;
+    }
+
+    /* Avis d’étudiants */
+    .reviews {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+    }
+    .review {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      display: none;
+      opacity: 0;
+      background: rgba(255,255,255,0.8);
+      padding: 1em;
+      border-left: 5px solid #138808;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+    .review.show {
+      display: block;
+      animation: fadeIn 1s forwards;
+    }
+    .review blockquote {
+      margin: 0;
+      color: #444;
+      font-style: italic;
+    }
+    .review em {
+      display: block;
+      margin-top: 0.5em;
+      text-align: right;
+      color: #777;
+    }
+
+    /* Animations keyframes */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px);} to { opacity: 1; transform: none;} }
+  </style>
+</head>
+<body>
+
+  <!-- Bouton d'accueil -->
+  <a href="/Efrei-Decouverte-dev-front/frontend/index.html" class="home-button">Accueil</a>
+
+  <header>
+    <h1>Bienvenue à Manipal 🇮🇳</h1>
+  </header>
+
+  <section class="scroll-section">
+    <h2>Description Générale</h2>
+    <p>L’Inde, riche de ses diversités culturelles, offre un patrimoine historique et une cuisine variée. Manipal, petite ville universitaire, est réputée pour sa qualité d’enseignement et son ambiance estudiantine.</p>
+  </section>
+
+  <section class="scroll-section">
+    <h2>Zoom sur Manipal</h2>
+    <p>Manipal, située au Karnataka, abrite l’Academy of Higher Education. Son campus vert et ses installations modernes attirent étudiants indiens et internationaux.</p>
+  </section>
+
+  <section class="scroll-section">
+    <h2>Niveau de Vie</h2>
+    <p>Le coût moyen de la vie à Manipal est d’environ 3700 € (logement, alimentation, transports), raisonnable pour étudier en Inde.</p>
+  </section>
+
+  <section class="scroll-section">
+    <h2>Lieux Incontournables</h2>
+    <div class="places">
+      <div class="place-card scroll-card">
+        <img src="https://example.com/manipal-campus.jpg" alt="Campus de Manipal">
+        <h3>Campus de Manipal Academy</h3>
+      </div>
+      <div class="place-card scroll-card">
+        <img src="https://example.com/udupi-temple.jpg" alt="Temple d’Udupi">
+        <h3>Temple d’Udupi</h3>
+      </div>
+      <div class="place-card scroll-card">
+        <img src="https://example.com/karkala-hills.jpg" alt="Collines de Karkala">
+        <h3>Collines de Karkala</h3>
+      </div>
+      <div class="place-card scroll-card">
+        <img src="https://example.com/manipal-beach.jpg" alt="Plage de Malpe">
+        <h3>Plage de Malpe</h3>
+      </div>
+    </div>
+  </section>
+
+  <section class="scroll-section">
+    <h2>Avis d’étudiants</h2>
+    <div class="reviews">
+      <div class="review">
+        <blockquote>"MAHE offre un environnement académique de premier plan et un campus sécurisé."</blockquote>
+        <em>- Étudiant MAHE 2024</em>
+      </div>
+      <div class="review">
+        <blockquote>"La vie à Manipal est paisible, idéale pour se concentrer sur les études."</blockquote>
+        <em>- Blog StudyAbroad</em>
+      </div>
+      <div class="review">
+        <blockquote>"Les excursions vers les plages et les collines sont très appréciées le week-end."</blockquote>
+        <em>- TripAdvisor</em>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sections = document.querySelectorAll('.scroll-section');
+      const cards = document.querySelectorAll('.scroll-card');
+      const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) { entry.target.classList.add('active'); obs.unobserve(entry.target); }
+        });
+      }, { threshold: 0.1 });
+      sections.forEach(s => observer.observe(s));
+      cards.forEach(c => observer.observe(c));
+
+      const reviews = document.querySelectorAll('.review');
+      let idx = 0;
+      function showReview(i) {
+        reviews.forEach(r => { r.classList.remove('show'); r.style.display = 'none'; });
+        const cur = reviews[i]; cur.style.display = 'block'; cur.classList.add('show');
+      }
+      showReview(0);
+      setInterval(() => { idx = (idx + 1) % reviews.length; showReview(idx); }, 5000);
+    });
+  </script>
+
+</body>
+</html>
