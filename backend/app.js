@@ -26,7 +26,6 @@ db.connect((err) => {
   }
 });
 
-
 // ==========================
 //   ROUTES DESTINATIONS
 //   (destinations.html)
