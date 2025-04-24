@@ -21,10 +21,27 @@ Projet Green IT – minimisation de l’empreinte carbone web.
 
 ## Architecture du projet
 
-backend/ # Node.js + Express (API) ├── app.js ├── package.json ├── package-lock.json ├── node_modules/ └── ...
+## Architecture du projet
 
-frontend/ # Front HTML/CSS/JS ├── index.html ├── html/ ├── css/ ├── js/ ├── images/ └── ...
+```
+backend/         # Node.js + Express (API)
+├── app.js
+├── package.json
+├── package-lock.json
+├── node_modules/
+└── ...
 
-database/ ├── BDD Efrei decouverte.sql # Création BDD ├── Table de données.sql # Données exemples
+frontend/        # Front HTML/CSS/JS
+├── index.html
+├── html/
+├── css/
+├── js/
+├── images/
+└── ...
+
+database/
+├── BDD Efrei decouverte.sql      # Création BDD
+├── Table de données.sql          # Données exemples
 
 README.md
+```
