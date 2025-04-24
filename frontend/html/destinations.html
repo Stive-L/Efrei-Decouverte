@@ -42,7 +42,7 @@
     // Si connecté, on charge ses favoris avant d’afficher les destinations
     function loadDestinationsWithFavoris() {
       if (id_utilisateur) {
-        fetch('" + window.API_BASE_URL + "/api/favoris/' + id_utilisateur)
+        fetch(" + window.API_BASE_URL + "/api/favoris/ + id_utilisateur)
           .then(res => res.json())
           .then(favs => {
             favorisIds = favs.map(f => f.id_destination);
@@ -55,7 +55,7 @@
     }
 
     function loadDestinations() {
-      fetch('" + window.API_BASE_URL + "/api/destinations')
+      fetch(" + window.API_BASE_URL + "/api/destinations)
         .then(res => res.json())
         .then(data => {
           const ul = document.getElementById('dest-list');
@@ -97,7 +97,7 @@
             window.location.href = "login.html";
             return;
           }
-          fetch('" + window.API_BASE_URL + "/api/favoris', {
+          fetch(" + window.API_BASE_URL + "/api/favoris, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ id_utilisateur, id_destination })
