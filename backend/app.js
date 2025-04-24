@@ -225,6 +225,101 @@ app.delete('/api/avis/:id_avis', (req, res) => {
         }
     });
 });
+
+// ========== Détail d'une destination ==========
+app.get('/api/destinations/:id', (req, res) => {
+  const id = req.params.id;
+  db.query('SELECT * FROM Destination WHERE id_destination = ?', [id], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+    if (!results.length) return res.status(404).json({ error: 'Destination introuvable' });
+    res.json(results[0]);
+  });
+});
+
+// --- Avis pour une destination ---
+app.get('/api/avis/destination/:id_destination', (req, res) => {
+  const id = req.params.id_destination;
+  const sql = `
+    SELECT 
+      a.id_avis, a.commentaire, a.annee_mobilite, a.code_type, a.date_creation,
+      u.nom, u.prenom,
+      (SELECT note FROM Notation WHERE id_avis=a.id_avis AND critere='qualite_cours') AS qualite_cours,
+      (SELECT note FROM Notation WHERE id_avis=a.id_avis AND critere='logement') AS logement,
+      (SELECT note FROM Notation WHERE id_avis=a.id_avis AND critere='climat') AS climat,
+      (SELECT note FROM Notation WHERE id_avis=a.id_avis AND critere='vie_locale') AS vie_locale,
+      (SELECT note FROM Notation WHERE id_avis=a.id_avis AND critere='accessibilite') AS accessibilite
+    FROM Avis a
+      JOIN Utilisateur u ON a.id_utilisateur = u.id_utilisateur
+    WHERE a.id_destination = ?
+    ORDER BY a.date_creation DESC
+  `;
+  db.query(sql, [id], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+    res.json(results);
+  });
+});
+
+app.get('/api/avis/:id_avis/like/:id_utilisateur', (req, res) => {
+  const { id_avis, id_utilisateur } = req.params;
+  db.query(
+    "SELECT * FROM LikeAvis WHERE id_avis=? AND id_utilisateur=?",
+    [id_avis, id_utilisateur],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+      res.json({ liked: results.length > 0 });
+    }
+  );
+});
+
+app.post('/api/avis/:id_avis/like', (req, res) => {
+  const { id_utilisateur } = req.body;
+  const id_avis = req.params.id_avis;
+
+  // Vérifie si déjà liké
+  db.query(
+    "SELECT * FROM LikeAvis WHERE id_avis=? AND id_utilisateur=?",
+    [id_avis, id_utilisateur],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+
+      if (results.length > 0) {
+        // Déjà liké, alors UNLIKE
+        db.query(
+          "DELETE FROM LikeAvis WHERE id_avis=? AND id_utilisateur=?",
+          [id_avis, id_utilisateur],
+          (err2) => {
+            if (err2) return res.status(500).json({ error: 'Erreur suppression' });
+            res.json({ liked: false }); // Maintenant n’est plus liké
+          }
+        );
+      } else {
+        // Pas encore liké, alors LIKE
+        db.query(
+          "INSERT INTO LikeAvis (id_avis, id_utilisateur) VALUES (?, ?)",
+          [id_avis, id_utilisateur],
+          (err3) => {
+            if (err3) return res.status(500).json({ error: 'Erreur ajout' });
+            res.json({ liked: true }); // Maintenant c’est liké
+          }
+        );
+      }
+    }
+  );
+});
+
+app.get('/api/avis/:id_avis/likes', (req, res) => {
+  const id_avis = req.params.id_avis;
+  db.query(
+    'SELECT COUNT(*) AS nb FROM LikeAvis WHERE id_avis=?',
+    [id_avis],
+    (err, results) => {
+      if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+      res.json({ likes: results[0].nb });
+    }
+  );
+});
+
+
 // ==========================
 //   ROUTES ADMIN (EXEMPLES)
 //   (admin.html, ajouter_destination.html, etc.)
