@@ -74,8 +74,7 @@ README.md
 - **Front-end :** HTML5, CSS3, JavaScript (Vanilla)
 - **Back-end :** Node.js, Express
 - **Base de données :** MySQL
-- **Déploiement :** Railway (Cloud) — compatible Vercel/Render
-- **Autres :** Vite (optionnel pour build front)
+- **Déploiement :** Railway (Cloud)
 
 ---
 
