@@ -16,3 +16,9 @@ Projet Green IT – minimisation de l’empreinte carbone web.
 - **Aider les étudiants EFREI** à choisir leur destination de mobilité avec des retours d’expérience.
 - **Informer** sur la vie à l’étranger (conseils, avis, forum, favoris).
 - **Réduire l’empreinte carbone** du site par l’éco-conception (images compressées, etc.).
+
+---
+
+## Architecture du projet
+
+/backend/ # Node.js + Express (API) ├── app.js ├── package.json └── ... /frontend/ # Front HTML/CSS/JS ├── index.html ├── html/ ├── css/ ├── js/ └── images/ /database/ ├── BDD Efrei decouverte.sql # Création BDD ├── Table de données.sql # Données exemples README.md
