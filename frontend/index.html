@@ -65,25 +65,7 @@
 </main>
 <script src="js/connexion.js"></script>
 <script>
-    let heroDisparu = false;
-    const navbar = document.getElementById('navbar');
-    const hero = document.querySelector('.hero');
     const slides = document.querySelectorAll('.slide');
-    
-    window.addEventListener('scroll', function() {
-    if (window.scrollY === 0 && heroDisparu) {
-        hero.classList.remove('hide-hero');
-        heroDisparu = false;
-        navbar.classList.remove('bg-blanc');
-    }
-    if (heroDisparu || window.scrollY > 20) {
-        navbar.classList.add('bg-blanc');
-    } else {
-        navbar.classList.remove('bg-blanc');
-    }
-    });
-    
-    
     let currentSlide = 0;
     setInterval(() => {
         slides[currentSlide].classList.remove('active');
@@ -91,39 +73,6 @@
         slides[currentSlide].classList.add('active');
     }, 4000);
     
-    (function(){
-        let hasSnapped = false;
-        let touchStart = 0;
-    
-        function snapToMain() {
-            hero.classList.add('hide-hero');
-            navbar.classList.add('bg-blanc');
-            heroDisparu = true;
-        }
-        function shouldSnap() {
-            const rect = hero.getBoundingClientRect();
-            return window.scrollY < 100 && rect.bottom > window.innerHeight * 0.55;
-        }
-        window.addEventListener('wheel', function(e) {
-            if (!hasSnapped && shouldSnap() && e.deltaY > 0) {
-                hasSnapped = true;
-                snapToMain();
-                setTimeout(() => { hasSnapped = false; }, 1200);
-            }
-        }, {passive: false});
-    
-        document.addEventListener('touchstart', e => {
-            if (e.touches.length === 1) touchStart = e.touches[0].clientY;
-        });
-        document.addEventListener('touchmove', e => {
-            let move = e.touches[0].clientY;
-            if (!hasSnapped && shouldSnap() && (touchStart - move) > 16) {
-                hasSnapped = true;
-                snapToMain();
-                setTimeout(() => { hasSnapped = false; }, 1200);
-            }
-        });
-    })();
 </script>
 </body>
 </html>
