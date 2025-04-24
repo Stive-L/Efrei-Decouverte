@@ -117,7 +117,7 @@ Ouvrir `frontend/index.html`
 
 ---
 
-## 5. Équipe projet
+## Équipe projet
 
 - LEE Zhuo Chan Stive
 - TEILLET Paul
