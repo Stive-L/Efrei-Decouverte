@@ -339,7 +339,7 @@ app.post('/api/avis/signaler', (req, res) => {
 app.get('/api/forum', (req, res) => {
   db.query(
     `SELECT f.*, d.universite, d.ville, d.pays, u.prenom, u.nom
-     FROM forumdestination f
+     FROM ForumDestination f
      LEFT JOIN Destination d ON f.id_destination = d.id_destination
      LEFT JOIN Utilisateur u ON f.id_utilisateur = u.id_utilisateur
      ORDER BY f.date_message DESC`,
@@ -359,7 +359,7 @@ app.post('/api/forum', (req, res) => {
     return res.status(400).json({ error: "Champs manquants" });
   }
   db.query(
-    "INSERT INTO forumdestination (id_utilisateur, id_destination, contenu, date_message) VALUES (?, ?, ?, NOW())",
+    "INSERT INTO ForumDestination (id_utilisateur, id_destination, contenu, date_message) VALUES (?, ?, ?, NOW())",
     [id_utilisateur, id_destination, contenu],
     (err) => {
       if (err) {
@@ -406,7 +406,7 @@ app.delete('/api/forum/:id_message', (req, res) => {
   const id_utilisateur = req.body.id_utilisateur; // doit être envoyé côté client
   // On vérifie si l'utilisateur est l'auteur
   db.query(
-    'SELECT * FROM forumdestination WHERE id_message = ? AND id_utilisateur = ?',
+    'SELECT * FROM ForumDestination WHERE id_message = ? AND id_utilisateur = ?',
     [id_message, id_utilisateur],
     (err, results) => {
       if (err) return res.status(500).json({ error: 'Erreur MySQL' });
@@ -415,7 +415,7 @@ app.delete('/api/forum/:id_message', (req, res) => {
       // Supprime d'abord les réponses associées
       db.query('DELETE FROM forum_reponse WHERE id_message = ?', [id_message], () => {
         // Puis supprime le message principal
-        db.query('DELETE FROM forumdestination WHERE id_message = ?', [id_message], (err2) => {
+        db.query('DELETE FROM ForumDestination WHERE id_message = ?', [id_message], (err2) => {
           if (err2) return res.status(500).json({ error: 'Erreur MySQL' });
           res.json({ success: true });
         });
