@@ -72,7 +72,7 @@ cd efrei-decouverte
 
 ---
 
-## 3. Back-end
+### 3. Back-end
 
 ```bash
 cd backend
@@ -89,7 +89,7 @@ Le serveur tourne sur [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 4. Front-end
+### 4. Front-end
 
 Ouvrir `frontend/index.html`  
 
