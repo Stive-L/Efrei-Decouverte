@@ -7,7 +7,32 @@ Projet Green IT – minimisation de l’empreinte carbone web.
 
 ## Lien du site
 
-- Front-end : [https://efrei-and-decouverte-front-production.up.railway.app](https://efrei-and-decouverte-front-production.up.railway.app)
+- **Front-end :** https://efrei-and-decouverte-front-production.up.railway.app  
+- **Back-end (API) :** https://efrei-and-decouverte-back-production.up.railway.app
+
+---
+
+## Endpoints pour lire les données
+
+- **Destinations**  
+  - `GET /api/destinations`  
+    → Retourne la liste de toutes les destinations  
+  - `GET /api/destinations/:id`  
+    → Retourne la fiche détaillée d’une destination (par `id`)
+
+- **Avis**  
+  - `GET /api/avis`  
+    → Retourne tous les avis  
+  - `GET /api/avis/destination/:id`  
+    → Retourne les avis pour une destination donnée
+
+- **Utilisateurs**  
+  - `GET /api/mes-avis/:id_utilisateur`  
+    → Retourne les avis postés par un utilisateur
+
+- **Favoris**  
+  - `GET /api/favoris/:id_utilisateur`  
+    → Retourne la liste des destinations favorites d’un utilisateur
 
 ---
 
