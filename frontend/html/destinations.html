@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Destinations | EFREI & DECOUVERTE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Liens vers ta police Google & ton CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700;500&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header id="navbar">
+      <div class="nav">
+          <div class="logo">EFREI & DECOUVERTE</div>
+          <nav>
+              <a href="../index.html">ACCUEIL</a>
+              <a href="destinations.html" class="active">DESTINATIONS</a>
+              <a href="avis.html">AVIS</a>
+              <a href="forum.html">FORUM</a>
+              <span id="user-menu-container">
+                <a href="login.html" id="user-menu-link" class="user-nav">SE CONNECTER</a>
+                <div id="user-dropdown" class="dropdown-menu" style="display: none;"></div>
+              </span>
+          </nav>
+      </div>
+  </header>
+  <main>
+      <h2>Destinations proposées</h2>
+      <ul class="dest-list" id="dest-list">
+          <li>Chargement...</li>
+      </ul>
+  </main>
+  <footer>
+      <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
+  </footer>
+  <script src="../js/connexion.js"></script>
+  <script>
+    // Récupère les destinations et gère les favoris
+    const id_utilisateur = localStorage.getItem('id_utilisateur');
+    let favorisIds = [];
+
+    // Si connecté, on charge ses favoris avant d’afficher les destinations
+    function loadDestinationsWithFavoris() {
+      if (id_utilisateur) {
+        fetch('http://localhost:3000/api/favoris/' + id_utilisateur)
+          .then(res => res.json())
+          .then(favs => {
+            favorisIds = favs.map(f => f.id_destination);
+            loadDestinations();
+          })
+          .catch(() => loadDestinations());
+      } else {
+        loadDestinations();
+      }
+    }
+
+    function loadDestinations() {
+      fetch('http://localhost:3000/api/destinations')
+        .then(res => res.json())
+        .then(data => {
+          const ul = document.getElementById('dest-list');
+          if (!data.length) {
+            ul.innerHTML = "<li>Aucune destination disponible.</li>";
+            return;
+          }
+          ul.innerHTML = "";
+          data.forEach(dest => {
+            const isFav = favorisIds.includes(dest.id_destination);
+            ul.innerHTML += `
+                <li data-id="${dest.id_destination}">
+                  <div class="universite-row">
+                    <span class="universite">${dest.universite}</span>
+                    <button class="star-fav" title="Favori">${isFav ? '★' : '☆'}</button>
+                  </div>
+                  <div class="ville">${dest.ville}, ${dest.pays}</div>
+                  <div>Langue : ${dest.langue} &nbsp; | &nbsp; Coût de la vie : ${dest.cout_vie_moyen} €</div>
+                  <a class="btn-fiche" href="destination.html?id=${dest.id_destination}">Voir la fiche</a>
+                </li>
+          `;
+          });
+          addStarListeners();
+        })
+        .catch(() => {
+          document.getElementById('dest-list').innerHTML = "<li>Erreur lors du chargement des destinations.</li>";
+        });
+    }
+
+    // Ajoute les listeners sur toutes les étoiles
+    function addStarListeners() {
+      document.querySelectorAll('.star-fav').forEach(star => {
+        star.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const li = this.closest('li');
+          const id_destination = li.getAttribute('data-id');
+          if (!id_utilisateur) {
+            alert("Vous devez être connecté pour ajouter une destination en favori !");
+            window.location.href = "login.html";
+            return;
+          }
+          fetch('http://localhost:3000/api/favoris', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ id_utilisateur, id_destination })
+          })
+          .then(res => res.json())
+          .then(result => {
+            if (result.success) {
+              this.textContent = (this.textContent === '★') ? '☆' : '★';
+            } else {
+              alert("Erreur lors de l’ajout/retrait des favoris.");
+            }
+          });
+        });
+      });
+    }
+
+    // Chargement initial
+    loadDestinationsWithFavoris();
+  </script>
+</body>
+</html>

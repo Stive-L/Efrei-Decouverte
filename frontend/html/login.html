@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Se connecter | EFREI & DECOUVERTE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700;500&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        @media (max-width: 600px) {
+            .login-container { padding: 16px 7vw; margin-top: 85px; }
+        }
+    </style>
+</head>
+<body>
+<header id="navbar">
+    <div class="nav">
+        <div class="logo">EFREI & DECOUVERTE</div>
+        <nav>
+            <a href="../index.html">ACCUEIL</a>
+            <a href="destinations.html">DESTINATIONS</a>
+            <a href="avis.html">AVIS</a>
+            <a href="forum.html">FORUM</a>
+            <a href="login.html" class="active">SE CONNECTER</a>
+        </nav>
+    </div>
+</header>
+<main>
+    <div class="login-container">
+        <h2>Connexion</h2>
+        <form class="login-form" id="login-form" autocomplete="on">
+            <div class="login-error" id="login-error"></div>
+            <label for="email">Adresse email EFREI</label>
+            <input type="text" id="email" name="email" placeholder="prenom.nom@myefrei.fr" required autocomplete="email" autofocus>
+            <label for="password">Mot de passe</label>
+            <input type="password" id="password" name="password" placeholder="Mot de passe" required autocomplete="current-password">
+            <input type="submit" value="Se connecter">
+        </form>
+        <div class="login-info">
+            <span>Pas encore de compte ?</span>
+            <a href="register.html">Créer un compte</a>
+        </div>
+    </div>
+</main>
+<footer>
+    <p>© 2024 EFREI & DECOUVERTE. Projet étudiant.</p>
+</footer>
+<script src="../js/connexion.js"></script>
+<script>
+const form = document.getElementById('login-form');
+const errorDiv = document.getElementById('login-error');
+
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    errorDiv.style.display = "none";
+    const email = form.email.value.trim();
+    const password = form.password.value;
+
+    if (!email || !password) {
+        errorDiv.textContent = "Merci de remplir tous les champs !";
+        errorDiv.style.display = "block";
+        return;
+    }
+
+    // Envoie la requête de connexion à ton back-end
+    fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+    if (data.success) {
+        // Stocker les infos utilisateur AVANT de rediriger
+        localStorage.setItem('nom', data.nom);
+        localStorage.setItem('prenom', data.prenom);
+        localStorage.setItem('role', data.id_role); // Utilise bien id_role (côté back) !
+        localStorage.setItem('id_utilisateur', data.id_utilisateur);
+        window.location.href = "../index.html"; // Redirection APRÈS stockage
+    } else {
+        errorDiv.textContent = data.error || "Identifiants incorrects";
+        errorDiv.style.display = "block";
+    }
+    })
+    .catch(() => {
+        errorDiv.textContent = "Erreur de connexion au serveur.";
+        errorDiv.style.display = "block";
+    });
+});
+
+
+</script>
+</body>
+</html>

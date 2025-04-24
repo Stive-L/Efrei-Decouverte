@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mes Favoris | EFREI & DECOUVERTE</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <!-- Barre de navigation habituelle (copie le header des autres pages) -->
+  <header id="navbar">
+      <div class="nav">
+          <div class="logo">EFREI & DECOUVERTE</div>
+          <nav>
+              <a href="../index.html">ACCUEIL</a>
+              <a href="destinations.html">DESTINATIONS</a>
+              <a href="avis.html">AVIS</a>
+              <a href="forums.html">FORUM</a>
+              <span id="user-menu-container">
+                  <a href="login.html" id="user-menu-link" class="user-nav">SE CONNECTER</a>
+                  <div id="user-dropdown" class="dropdown-menu" style="display: none;"></div>
+              </span>
+          </nav>
+      </div>
+  </header>
+
+  <main>
+    <h2>Mes Favoris</h2>
+    <ul id="favoris-list">Chargement...</ul>
+  </main>
+
+  <script src="../js/connexion.js"></script>
+  <script>
+    // Vérifier que l'utilisateur est connecté
+    const idUtilisateur = localStorage.getItem('id_utilisateur');
+    if (!idUtilisateur) {
+      window.location.href = "login.html";
+    }
+
+    fetch(`http://localhost:3000/api/favoris/${idUtilisateur}`)
+      .then(res => res.json())
+      .then(favoris => {
+        const ul = document.getElementById('favoris-list');
+        if (!favoris.length) {
+          ul.innerHTML = "<li>Aucun favori pour l’instant.</li>";
+          return;
+        }
+        ul.innerHTML = "";
+        favoris.forEach(dest => {
+          ul.innerHTML += `
+            <li>
+              <strong>${dest.universite}</strong> — ${dest.ville}, ${dest.pays}<br>
+              <a href="fiche_destination.html?id=${dest.id_destination}">Voir la fiche</a>
+            </li>
+          `;
+        });
+      });
+  </script>
+</body>
+</html>
