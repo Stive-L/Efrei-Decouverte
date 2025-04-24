@@ -12,10 +12,11 @@ app.use(express.json());
 //   Connexion à la BDD
 // ==========================
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',        
-  password: '12345',        
-  database: 'efrei_decouverte'
+  host: process.env.MYSQLHOST,
+  user: process.env.MYSQLUSER,
+  password: process.env.MYSQLPASSWORD,
+  database: process.env.MYSQLDATABASE,
+  port: process.env.MYSQLPORT
 });
 
 db.connect((err) => {
