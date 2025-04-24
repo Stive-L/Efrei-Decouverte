@@ -69,7 +69,7 @@ INSERT INTO Avis (
 ) VALUES
   (1, 1, 'I1', 2023, 'Expérience incroyable à Concordia : cours de haute qualité et vie étudiante dynamique.'),
   (2, 3, 'I3', 2022, 'Staffordshire University offre un bon encadrement mais le coût de la vie est élevé.'),
-  (1, 5, 'I2', 2021, 'Stage à AGH University très enrichissant, équipe accueillante.'),
+  (1, 5, 'I2', 2024, 'Stage à AGH University très enrichissant, équipe accueillante.'),
   (4, 2, 'PEX', 2023, 'Cape Peninsula agréable mais l’adaptation au climat est difficile.');
 
 
