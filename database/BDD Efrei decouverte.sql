@@ -191,8 +191,8 @@ CREATE TABLE forum_reponse (
   id_utilisateur BIGINT UNSIGNED NOT NULL,
   contenu TEXT NOT NULL,
   date_reponse DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (id_message) REFERENCES forumdestination(id_message),
-  FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur)
+  FOREIGN KEY (id_message) REFERENCES ForumDestination(id_message),
+  FOREIGN KEY (id_utilisateur) REFERENCES Utilisateur(id_utilisateur)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Réponses aux forums';
 
 -- Table des statistiques écologiques et d’activité du site
