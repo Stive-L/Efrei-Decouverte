@@ -376,7 +376,7 @@ app.get('/api/forum/:id_message/reponses', (req, res) => {
   db.query(`
     SELECT r.*, u.prenom, u.nom
     FROM forum_reponse r
-    JOIN utilisateur u ON r.id_utilisateur = u.id_utilisateur
+    JOIN Utilisateur u ON r.id_utilisateur = u.id_utilisateur
     WHERE r.id_message = ?
     ORDER BY r.date_reponse ASC
   `, [id], (err, results) => {
