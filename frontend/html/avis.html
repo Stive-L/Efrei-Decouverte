@@ -37,11 +37,10 @@
     <script src="../js/avis_actions.js"></script>
     <script src="../js/config.js"></script>
     <script>
-        // Affiche tous les avis de la BDD
-                function afficherTousLesAvis() {
-            fetch(window.API_BASE_URL + '/api/avis')
-            .then(res => res.json())
-            .then(async avisList => {
+        async function afficherTousLesAvis() {
+            try {
+                const res = await fetch(window.API_BASE_URL + '/api/avis');
+                const avisList = await res.json();
                 const ul = document.getElementById('avis-list');
                 if (!avisList.length) {
                     ul.innerHTML = "<li>Aucun avis disponible.</li>";
@@ -49,35 +48,34 @@
                 }
                 ul.innerHTML = "";
 
-                // Récupérer l’état "liked" + le vrai nombre de likes pour chaque avis
-                let likeStatusArray = [];
-                let nbLikesArray = [];
                 const id_utilisateur = localStorage.getItem('id_utilisateur');
-                if (id_utilisateur) {
-                    // Pour chaque avis, on récupère (en parallèle) : 
-                    // - si l'utilisateur a liké
-                    // - le nombre total de likes
-                    likeStatusArray = await Promise.all(avisList.map(avis =>
-                        fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`)
-                        .then(res => res.json())
-                        .then(data => data.liked)
-                        .catch(() => false)
-                    ));
-                    nbLikesArray = await Promise.all(avisList.map(avis =>
-                        fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`)
-                        .then(res => res.json())
-                        .then(data => data.likes)
-                        .catch(() => 0)
-                    ));
-                } else {
-                    // Si pas connecté : on affiche juste les nb de likes depuis avisList (SQL)
-                    likeStatusArray = avisList.map(() => false);
-                    nbLikesArray = avisList.map(avis => avis.likes || 0);
-                }
+                // On récupère statut "liked" et nombre de likes pour chaque avis
+                const finalList = await Promise.all(avisList.map(async avis => {
+                    let liked = false;
+                    if (id_utilisateur) {
+                        try {
+                            const resLike = await fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`);
+                            const dataLike = await resLike.json();
+                            liked = dataLike.liked;
+                        } catch (e) {
+                            liked = false;
+                        }
+                    }
+                    let nbLikes = 0;
+                    try {
+                        const resNb = await fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`);
+                        const dataNb = await resNb.json();
+                        nbLikes = dataNb.likes;
+                    } catch (e) {
+                        nbLikes = avis.likes || 0;
+                    }
+                    return { avis, liked, nbLikes };
+                }));
 
-                avisList.forEach((avis, idx) => {
-                    let liked = likeStatusArray[idx];
-                    let nbLikes = nbLikesArray[idx];
+                finalList.forEach(item => {
+                    const avis = item.avis;
+                    const liked = item.liked;
+                    const nbLikes = item.nbLikes;
                     ul.innerHTML += `
                         <li class="avis-item">
                             <div class="avis-header">
@@ -106,10 +104,9 @@
                         </li>
                     `;
                 });
-            })
-            .catch(() => {
+            } catch (err) {
                 document.getElementById("avis-list").innerHTML = "<li>Erreur lors du chargement des avis.</li>";
-            });
+            }
         }
 
         afficherTousLesAvis();
