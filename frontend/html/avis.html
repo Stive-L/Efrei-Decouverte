@@ -38,7 +38,7 @@
     <script src="../js/config.js"></script>
     <script>
         // Affiche tous les avis de la BDD
-        function afficherTousLesAvis() {
+                function afficherTousLesAvis() {
             fetch(window.API_BASE_URL + '/api/avis')
             .then(res => res.json())
             .then(async avisList => {
@@ -48,20 +48,36 @@
                     return;
                 }
                 ul.innerHTML = "";
-                // Pour affichage du coeur vert si déjà liké par l'utilisateur
+
+                // Récupérer l’état "liked" + le vrai nombre de likes pour chaque avis
                 let likeStatusArray = [];
+                let nbLikesArray = [];
                 const id_utilisateur = localStorage.getItem('id_utilisateur');
                 if (id_utilisateur) {
+                    // Pour chaque avis, on récupère (en parallèle) : 
+                    // - si l'utilisateur a liké
+                    // - le nombre total de likes
                     likeStatusArray = await Promise.all(avisList.map(avis =>
                         fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`)
                         .then(res => res.json())
                         .then(data => data.liked)
                         .catch(() => false)
                     ));
+                    nbLikesArray = await Promise.all(avisList.map(avis =>
+                        fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`)
+                        .then(res => res.json())
+                        .then(data => data.likes)
+                        .catch(() => 0)
+                    ));
+                } else {
+                    // Si pas connecté : on affiche juste les nb de likes depuis avisList (SQL)
+                    likeStatusArray = avisList.map(() => false);
+                    nbLikesArray = avisList.map(avis => avis.likes || 0);
                 }
-    
+
                 avisList.forEach((avis, idx) => {
                     let liked = likeStatusArray[idx];
+                    let nbLikes = nbLikesArray[idx];
                     ul.innerHTML += `
                         <li class="avis-item">
                             <div class="avis-header">
@@ -83,7 +99,7 @@
                                     <svg height="18" width="18" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:middle">
                                         <path d="M10.001 4.529c2.349-4.101 12.036-2.41 9.979 3.396-1.02 2.674-6.919 8.115-9.272 10.034-.381.304-.927.304-1.308 0C6.94 16.04 1.044 10.599.021 7.925c-2.055-5.806 7.629-7.497 9.98-3.396z"></path>
                                     </svg>
-                                    <span class="nb-likes">${avis.likes || 0}</span>
+                                    <span class="nb-likes">${nbLikes}</span>
                                 </span>
                                 <button class="avis-signaler" onclick="signalerAvis(${avis.id_avis})">Signaler</button>
                             </div>
@@ -95,7 +111,7 @@
                 document.getElementById("avis-list").innerHTML = "<li>Erreur lors du chargement des avis.</li>";
             });
         }
-    
+
         afficherTousLesAvis();
     </script>
 </body>
