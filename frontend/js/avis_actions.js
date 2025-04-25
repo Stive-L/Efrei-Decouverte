@@ -130,8 +130,11 @@ window.afficherAvisDestination = async function(id_destination) {
     }
     ul.innerHTML = "";
 
+    // Pour chaque avis : récupérer l’état liked ET le nombre de likes à jour
     let likeStatusArray = [];
+    let nbLikesArray = [];
     const id_utilisateur = localStorage.getItem('id_utilisateur');
+
     if (id_utilisateur) {
       likeStatusArray = await Promise.all(
         avisList.map(avis =>
@@ -141,13 +144,22 @@ window.afficherAvisDestination = async function(id_destination) {
             .catch(() => false)
         )
       );
+      nbLikesArray = await Promise.all(
+        avisList.map(avis =>
+          fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`)
+            .then(res => res.json())
+            .then(data => data.likes)
+            .catch(() => 0)
+        )
+      );
+    } else {
+      likeStatusArray = avisList.map(() => false);
+      nbLikesArray = avisList.map(avis => avis.likes || 0);
     }
-
-    // DEBUG : voir ce que tu reçois
-    console.log('likeStatusArray', likeStatusArray);
 
     avisList.forEach((avis, idx) => {
       let liked = likeStatusArray[idx];
+      let nbLikes = nbLikesArray[idx];
       ul.innerHTML += `
         <li class="avis-item">
           <div class="avis-header">
@@ -168,7 +180,7 @@ window.afficherAvisDestination = async function(id_destination) {
               <svg height="18" width="18" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:middle">
                 <path d="M10.001 4.529c2.349-4.101 12.036-2.41 9.979 3.396-1.02 2.674-6.919 8.115-9.272 10.034-.381.304-.927.304-1.308 0C6.94 16.04 1.044 10.599.021 7.925c-2.055-5.806 7.629-7.497 9.98-3.396z"></path>
               </svg>
-              <span class="nb-likes">${avis.likes || 0}</span>
+              <span class="nb-likes">${nbLikes}</span>
             </span>
             <button class="avis-signaler" onclick="signalerAvis(${avis.id_avis})">Signaler</button>
           </div>
