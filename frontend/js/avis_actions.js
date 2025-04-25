@@ -118,71 +118,72 @@ function showPopupSignalementHTML() {
   };
 }
 
-window.afficherAvisDestination = function(id_destination) {
-  fetch(`${window.API_BASE_URL}/api/avis/destination/${id_destination}`)
-    .then(res => res.json())
-    .then(function(avisList) {
-      const ul = document.getElementById("avis-list");
-      if (!avisList.length) {
-        ul.innerHTML = "<li>Aucun avis pour cette destination.</li>";
-        return;
+window.afficherAvisDestination = async function(id_destination) {
+  try {
+    const res = await fetch(`${window.API_BASE_URL}/api/avis/destination/${id_destination}`);
+    const avisList = await res.json();
+    const ul = document.getElementById("avis-list");
+    if (!avisList.length) {
+      ul.innerHTML = "<li>Aucun avis pour cette destination.</li>";
+      return;
+    }
+    ul.innerHTML = "";
+
+    const id_utilisateur = localStorage.getItem('id_utilisateur');
+    const finalList = await Promise.all(avisList.map(async avis => {
+      let liked = false;
+      if (id_utilisateur) {
+        try {
+          const resLike = await fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`);
+          const dataLike = await resLike.json();
+          liked = dataLike.liked;
+        } catch (e) {
+          liked = false;
+        }
       }
-      ul.innerHTML = "";
+      let nbLikes = 0;
+      try {
+        const resNb = await fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`);
+        const dataNb = await resNb.json();
+        nbLikes = dataNb.likes;
+      } catch (e) {
+        nbLikes = avis.likes || 0;
+      }
+      return { avis, liked, nbLikes };
+    }));
 
-      const id_utilisateur = localStorage.getItem('id_utilisateur');
-      let promises = avisList.map(function(avis) {
-        // Pour chaque avis, on récupère en parallèle
-        // - le statut "liked" pour cet utilisateur
-        // - le vrai nombre de likes (table likes)
-        let likedPromise = id_utilisateur
-          ? fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`)
-              .then(res => res.json()).then(d => d.liked).catch(() => false)
-          : Promise.resolve(false);
-
-        let nbLikesPromise = fetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`)
-          .then(res => res.json()).then(d => d.likes).catch(() => 0);
-
-        return Promise.all([likedPromise, nbLikesPromise])
-          .then(function([liked, nbLikes]) {
-            return { avis, liked, nbLikes };
-          });
-      });
-
-      Promise.all(promises).then(function(finalList) {
-        finalList.forEach(function(item) {
-          let avis = item.avis;
-          let liked = item.liked;
-          let nbLikes = item.nbLikes;
-          ul.innerHTML += `
-            <li class="avis-item">
-              <div class="avis-header">
-                <span class="avis-auteur">${avis.prenom} ${avis.nom}</span>
-                <span class="avis-date">${avis.date_creation ? new Date(avis.date_creation).toLocaleDateString('fr-FR') : avis.annee_mobilite || ''}</span>
-              </div>
-              <div class="avis-type">${avis.code_type} — ${avis.annee_mobilite}</div>
-              <div class="avis-commentaire">${avis.commentaire}</div>
-              <div class="avis-notes">
-                ${buildNoteBar("Qualité cours", avis.qualite_cours)}
-                ${buildNoteBar("Logement", avis.logement)}
-                ${buildNoteBar("Climat", avis.climat)}
-                ${buildNoteBar("Vie locale", avis.vie_locale)}
-                ${buildNoteBar("Accessibilité", avis.accessibilite)}
-              </div>
-              <div class="avis-footer">
-                <span class="avis-likes ${liked ? 'liked' : ''}" data-id="${avis.id_avis}" onclick="toggleLikeAvis(this)">
-                  <svg height="18" width="18" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:middle">
-                    <path d="M10.001 4.529c2.349-4.101 12.036-2.41 9.979 3.396-1.02 2.674-6.919 8.115-9.272 10.034-.381.304-.927.304-1.308 0C6.94 16.04 1.044 10.599.021 7.925c-2.055-5.806 7.629-7.497 9.98-3.396z"></path>
-                  </svg>
-                  <span class="nb-likes">${nbLikes}</span>
-                </span>
-                <button class="avis-signaler" onclick="signalerAvis(${avis.id_avis})">Signaler</button>
-              </div>
-            </li>
-          `;
-        });
-      });
-    })
-    .catch(() => {
-      document.getElementById("avis-list").innerHTML = "<li>Erreur lors du chargement des avis.</li>";
+    finalList.forEach(item => {
+      const avis = item.avis;
+      const liked = item.liked;
+      const nbLikes = item.nbLikes;
+      ul.innerHTML += `
+        <li class="avis-item">
+          <div class="avis-header">
+            <span class="avis-auteur">${avis.prenom} ${avis.nom}</span>
+            <span class="avis-date">${avis.date_creation ? new Date(avis.date_creation).toLocaleDateString('fr-FR') : avis.annee_mobilite || ''}</span>
+          </div>
+          <div class="avis-type">${avis.code_type} — ${avis.annee_mobilite}</div>
+          <div class="avis-commentaire">${avis.commentaire}</div>
+          <div class="avis-notes">
+            ${buildNoteBar("Qualité cours", avis.qualite_cours)}
+            ${buildNoteBar("Logement", avis.logement)}
+            ${buildNoteBar("Climat", avis.climat)}
+            ${buildNoteBar("Vie locale", avis.vie_locale)}
+            ${buildNoteBar("Accessibilité", avis.accessibilite)}
+          </div>
+          <div class="avis-footer">
+            <span class="avis-likes ${liked ? 'liked' : ''}" data-id="${avis.id_avis}" onclick="toggleLikeAvis(this)">
+              <svg height="18" width="18" viewBox="0 0 20 20" fill="currentColor" style="vertical-align:middle">
+                <path d="M10.001 4.529c2.349-4.101 12.036-2.41 9.979 3.396-1.02 2.674-6.919 8.115-9.272 10.034-.381.304-.927.304-1.308 0C6.94 16.04 1.044 10.599.021 7.925c-2.055-5.806 7.629-7.497 9.98-3.396z"></path>
+              </svg>
+              <span class="nb-likes">${nbLikes}</span>
+            </span>
+            <button class="avis-signaler" onclick="signalerAvis(${avis.id_avis})">Signaler</button>
+          </div>
+        </li>
+      `;
     });
+  } catch (err) {
+    document.getElementById("avis-list").innerHTML = "<li>Erreur lors du chargement des avis.</li>";
+  }
 }
