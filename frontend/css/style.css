@@ -462,8 +462,11 @@ h2 {
     transition: background 0.2s;
     border-bottom: 1px solid #f2f2f2;
 }
-.dropdown-menu a:last-child { border-bottom: none; }
-.dropdown-menu a:hover { background: #f4fbe8; }
+.dropdown-menu a:hover {
+    background: #eafaf1;
+    color: #267f3b; /* texte vert foncé */
+}
+
 
 footer {
     text-align: center;
