@@ -10,7 +10,7 @@
         .tabs-login {
             display: flex;
             justify-content: center;
-            margin: 32px 0 22px 0;
+            margin: 28px 0 18px 0;
         }
         .tabs-login button {
             font-family: inherit;
@@ -23,7 +23,7 @@
             cursor: pointer;
             color: #222;
             border-radius: 10px 10px 0 0;
-            transition: 0.2s;
+            transition: 0.18s;
         }
         .tabs-login button.active {
             border-bottom: 3px solid #2b63c1;
@@ -31,9 +31,37 @@
             font-weight: bold;
             color: #144a94;
         }
+        /* Pour garder la même largeur de la box même en mode register */
+        .tab-form {
+            display: none;
+            flex-direction: column;
+            gap: 0;
+        }
+        .tab-form.active {
+            display: flex;
+        }
+        .register-form label,
+        .register-form input[type="text"],
+        .register-form input[type="password"] {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .register-error,
+        .register-success {
+            color: #fff;
+            background: #62b36e;
+            border-radius: 8px;
+            padding: 9px 13px;
+            margin-bottom: 14px;
+            text-align: center;
+            font-size: 0.99rem;
+            display: none;
+        }
+        .register-error { background: #ffeaea; color: #a22424; }
+        .register-success { background: #e2ffe9; color: #228b4f; }
         @media (max-width: 600px) {
-            .login-container { padding: 18px 6vw; }
-            .tabs-login button { padding: 10px 10px; font-size: 15px; }
+            .login-container { padding: 15px 4vw; }
+            .tabs-login button { padding: 9px 10px; font-size: 15px; }
         }
     </style>
 </head>
@@ -57,7 +85,7 @@
             <button id="tab-register" type="button">Créer un compte</button>
         </div>
         <!-- Login -->
-        <form class="login-form" id="login-form" autocomplete="on">
+        <form class="login-form tab-form active" id="login-form" autocomplete="on">
             <div class="login-error" id="login-error"></div>
             <label for="email">Adresse email EFREI</label>
             <input type="text" id="email" name="email" placeholder="prenom.nom@efrei.net" required autocomplete="email" autofocus>
@@ -66,7 +94,7 @@
             <input type="submit" value="Se connecter">
         </form>
         <!-- Register -->
-        <form class="register-form" id="register-form" style="display:none">
+        <form class="register-form tab-form" id="register-form" autocomplete="on">
             <div class="register-error" id="register-error"></div>
             <div class="register-success" id="register-success"></div>
             <label for="prenom">Prénom</label>
@@ -87,22 +115,26 @@
 <script src="../js/config.js"></script>
 <script src="../js/connexion.js"></script>
 <script>
-    // --- Onglets Connexion / Inscription
-    document.getElementById('tab-login').onclick = function() {
-        this.classList.add('active');
-        document.getElementById('tab-register').classList.remove('active');
-        document.getElementById('login-form').style.display = "flex";
-        document.getElementById('register-form').style.display = "none";
-    }
-    document.getElementById('tab-register').onclick = function() {
-        this.classList.add('active');
-        document.getElementById('tab-login').classList.remove('active');
-        document.getElementById('login-form').style.display = "none";
-        document.getElementById('register-form').style.display = "flex";
-    }
+    // Onglets Connexion / Inscription
+    const tabLogin = document.getElementById('tab-login');
+    const tabRegister = document.getElementById('tab-register');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    tabLogin.onclick = function() {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.classList.add('active');
+        registerForm.classList.remove('active');
+    };
+    tabRegister.onclick = function() {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        registerForm.classList.add('active');
+        loginForm.classList.remove('active');
+    };
 
     // --- Connexion
-    const loginForm = document.getElementById('login-form');
     const loginErrorDiv = document.getElementById('login-error');
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -139,7 +171,6 @@
     });
 
     // --- Inscription
-    const registerForm = document.getElementById('register-form');
     const registerErrorDiv = document.getElementById('register-error');
     const registerSuccessDiv = document.getElementById('register-success');
     registerForm.addEventListener('submit', function(e) {
