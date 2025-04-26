@@ -1,460 +1,248 @@
-/* === BASE === */
-html, body {
-    margin: 0;
-    padding: 0;
-    scroll-behavior: smooth;
-    height: 100%;
-}
-body {
-    font-family: 'Open Sans', Arial, sans-serif;
-    background: #f5f5f5;
-    color: #222;
+/* ===================== */
+/* === THEME GREEN IT ===*/
+/* ===================== */
+
+/* Couleurs principales */
+:root {
+    --green: #62b36e;
+    --green-dark: #3d8242;
+    --green-light: #eafaf1;
+    --beige: #f5f5f5;
+    --blue: #2b63c1;
 }
 
-/* === HEADER & NAVBAR === */
-header {
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 100;
-    transition: background 0.35s, box-shadow 0.2s;
-    background: transparent;
-    box-shadow: none;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    border-bottom: none;
-}
-.nav {
-    background: transparent;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 4vw;
-}
-.logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 2.1rem;
-    letter-spacing: 2px;
-    font-weight: 700;
-    color: #262822;
-    margin-left: 0.3rem;
-    margin-top: 2px;
-}
-nav a {
-    font-family: 'Open Sans', Arial, sans-serif;
+/* Pour tous les boutons génériques */
+button, .button, input[type="submit"] {
+    background: var(--green);
     color: #fff;
-    text-decoration: none;
-    margin: 0 1.3vw;
-    font-weight: 600;
-    font-size: 1.17rem;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    transition: color 0.25s, opacity 0.25s;
-    opacity: 0.97;
-    background: transparent;
-    position: relative;
-    padding: 0 0.5vw;
-}
-nav a.active { color: #62b36e; }
-nav a:hover { color: #c2e7c3; }
-
-header.bg-blanc {
-    background: #fff !important;
-    box-shadow: 0 2px 18px #2222;
-    border-bottom: 2px solid #ececec;
-}
-header.bg-blanc nav a,
-header, header nav a {
-    color: #222 !important;
-    opacity: 1 !important;
-}
-header.bg-blanc .logo {
-    color: #262822 !important;
-}
-header.bg-blanc nav a.active,
-header nav a.active {
-    color: #62b36e !important;
-}
-
-/* Responsive NAV */
-@media (max-width: 600px) {
-    .nav { flex-direction: column; height: auto; }
-    .logo { margin-bottom: 6px; font-size: 1.1rem; }
-}
-
-/* === HERO SECTION (page d'accueil) === */
-.hero {
-    width: 100vw;
-    height: 100vh;
-    min-height: 340px;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.8s ease-in-out;
-    will-change: transform;
-}
-.slide {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transition: opacity 1.3s;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-.slide.active { opacity: 1; z-index: 1; }
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(15,20,20,0.13);
-    z-index: 2;
-}
-.hero-content {
-    position: relative;
-    color: #fff;
-    text-align: center;
-    z-index: 3;
-    font-size: 2.5vw;
-    letter-spacing: 2px;
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 700;
-    text-shadow: 0 4px 22px #222a;
-}
-.hero.hide-hero {
-    transform: translateY(-100%);
-    pointer-events: none;
-}
-@media (max-width: 900px) { .hero-content { font-size: 4vw; } }
-@media (max-width: 600px) { .hero-content { font-size: 7vw; } }
-
-/* === MAIN CONTAINER === */
-main {
-    max-width: 850px;
-    margin: 0 auto;
-    padding: 100px 4vw 0 4vw;
-    font-family: 'Open Sans', Arial, sans-serif;
-    background: #f5f5f5;
-}
-@media (max-width: 900px) { main { padding-top: 70px; } }
-@media (max-width: 600px) { main { padding-top: 40px; } }
-
-/* === TITRES === */
-h2, h3, h4 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 700;
-    letter-spacing: 1.1px;
-    color: #202a24;
-}
-h2 {
-    margin-top: 0;
-    font-size: 2.3rem;
-}
-@media (max-width: 600px) {
-    h2 { font-size: 1.19rem; }
-}
-
-/* === BUTTONS === */
-.button {
-    display: inline-block;
-    margin: 12px 18px 12px 0;
-    padding: 12px 26px;
-    background: #62b36e;
-    color: #fff;
-    border-radius: 22px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.2s;
-    font-size: 1.09rem;
-}
-.button:hover { background: #3d8242; }
-@media (max-width: 600px) {
-    .button { font-size: 0.96rem; padding: 10px 12px; }
-}
-
-/* ----------- LOGIN/REGISTER PAGE CSS ------------ */
-.login-container {
-    max-width: 420px;
-    margin: 110px auto 0 auto;
-    padding: 32px 28px 24px 28px;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 2px 16px #0002;
-}
-
-/* Onglets Connexion/Register */
-.tabs-login {
-    display: flex;
-    justify-content: center;
-    margin: 28px 0 18px 0;
-}
-.tabs-login button {
-    font-family: inherit;
-    background: #f2f2f2;
     border: none;
-    border-bottom: 3px solid transparent;
-    padding: 12px 28px;
-    margin: 0 4px;
-    font-size: 18px;
-    cursor: pointer;
-    color: #222;
-    border-radius: 10px 10px 0 0;
-    transition: 0.18s;
-}
-.tabs-login button.active {
-    border-bottom: 3px solid #2b63c1;
-    background: #fff;
-    font-weight: bold;
-    color: #144a94;
-}
-
-.tab-form {
-    display: none;
-    flex-direction: column;
-}
-.tab-form.active {
-    display: flex;
-}
-
-/* Login & Register form champs */
-.login-form label,
-.register-form label {
-    display: block;
-    margin-bottom: 6px;
-    color: #222;
+    border-radius: 18px;
+    padding: 10px 22px;
     font-weight: 600;
     font-size: 1.04rem;
-}
-
-.login-form input[type="text"],
-.login-form input[type="password"],
-.register-form input[type="text"],
-.register-form input[type="password"] {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 7px;
-    font-size: 1rem;
-    margin-bottom: 18px;
-    font-family: 'Open Sans', Arial, sans-serif;
-    background: #eaf2fd;
-    transition: border-color 0.2s;
-}
-.login-form input[type="text"]:focus,
-.login-form input[type="password"]:focus,
-.register-form input[type="text"]:focus,
-.register-form input[type="password"]:focus {
-    outline: none;
-    border-color: #2b63c1;
-    background: #f4f9ff;
-}
-
-.login-form input[type="submit"],
-.register-form input[type="submit"] {
-    width: 100%;
-    padding: 13px 0;
-    background: #62b36e;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 1.08rem;
-    transition: background 0.2s;
+    box-shadow: 0 1px 7px #0001;
+    transition: background 0.19s, box-shadow 0.17s;
     cursor: pointer;
-    margin-top: 4px;
 }
-.login-form input[type="submit"]:hover,
-.register-form input[type="submit"]:hover {
-    background: #3d8242;
+button:hover, .button:hover, input[type="submit"]:hover {
+    background: var(--green-dark);
+    box-shadow: 0 2px 16px #c2e7c34a;
 }
-
-.login-error, .register-error {
-    color: #a22424;
-    background: #ffeaea;
-    border-radius: 8px;
-    padding: 9px 13px;
-    margin-bottom: 14px;
-    text-align: center;
-    font-size: 0.99rem;
-    display: none;
-}
-.register-success {
-    color: #21743a;
-    background: #e7fae6;
-    border-radius: 8px;
-    padding: 9px 13px;
-    margin-bottom: 14px;
-    text-align: center;
-    font-size: 0.99rem;
-    display: none;
-}
-
-
-/* === PAGE DESTINATIONS === */
-.dest-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-    padding: 0;
-    margin: 2rem auto;
-    max-width: 1200px;
-    list-style: none;
-}
-.dest-list li {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-    padding: 1.5rem 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    min-width: 0;
-}
-.btn-fiche {
-    margin-top: 1rem;
-    padding: 0.5rem 1.2rem;
-    border-radius: 8px;
-    background: #2ecc71;
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background 0.2s;
-}
-.btn-fiche:hover { background: #27ae60; }
-.universite-row { display: flex; align-items: center; gap: 7px; margin-bottom: 0.2em; }
-.universite { font-weight: bold; font-size: 1.13em; }
-.ville { font-size: 0.96rem; color: #666; margin-bottom: 0.2em; }
-
-/* === FAVORIS (étoile) === */
-.star-fav {
-    background: none;
-    border: none;
-    font-size: 1.25em;
-    color: gold;
-    cursor: pointer;
-    vertical-align: middle;
-    margin: 0;
-    padding: 0;
-    height: 1.35em;
-    width: 1.35em;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    transition: transform 0.15s;
-}
-.star-fav:hover {
-    transform: scale(1.15);
-    filter: drop-shadow(0 0 3px gold);
-}
-
-/* === PAGE AVIS === */
-.avis-list { list-style: none; padding: 0; margin: 0; }
-.avis-item {
-    background: #fff;
-    border-radius: 14px;
-    margin-bottom: 34px;
-    padding: 24px 20px;
-    box-shadow: 0 2px 10px #0001;
-}
-.avis-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.avis-auteur { font-weight: bold; font-size: 1.08em; }
-.avis-destination { color: #21743a; font-size: 1.01em; }
-.avis-type { font-size: 0.98em; color: #555; }
-.avis-commentaire { margin: 14px 0; font-size: 1.13em; }
-.avis-notes { margin: 10px 0 14px 0; }
-.avis-note { margin-bottom: 7px; display: flex; align-items: center; }
-.avis-footer { display: flex; align-items: center; gap: 18px; margin-top: 8px; font-size: 0.95em; }
-.avis-likes { display: flex; align-items: center; gap: 4px; cursor: pointer; transition: color .2s; }
-.avis-likes:hover { color: #34926c; }
-.avis-likes.liked { color: #34926c !important; }
-.avis-date { color: #aaa; }
-.avis-signaler {
-    background: #ffeaea;
-    color: #a22;
-    border: none;
-    border-radius: 9px;
-    padding: 3px 14px;
-    font-size: 0.97em;
-    cursor: pointer;
-    margin-left: 18px;
-}
-.avis-signaler:hover { background: #ffd3d3; }
-.avis-note-bar {
-    display: inline-block;
-    vertical-align: middle;
-    width: 78%;
-    height: 10px;
-    background: #e2e2e2;
-    border-radius: 8px;
-    margin: 0 10px 0 6px;
-    position: relative;
-    overflow: hidden;
-}
-.avis-note-bar-inner {
-    display: block;
-    height: 100%;
-    background: #62b36e;
-    border-radius: 8px;
-    transition: width 0.5s;
-}
-.avis-note-val {
-    min-width: 36px;
-    display: inline-block;
-    text-align: right;
-    font-size: 1em;
+button.annuler, .button.annuler {
+    background: #ececec;
     color: #444;
 }
-.avis-note-label {
-    display: inline-block;
-    min-width: 120px;
+button.annuler:hover, .button.annuler:hover {
+    background: #d3e7dc;
+    color: #222;
 }
 
-/* === DROPDOWN MENU (utilisateur/admin) === */
-#user-menu-container, #admin-menu-container {
-    position: relative;
-    display: inline-block;
-}
-#user-menu-link.user-nav { cursor: pointer; }
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 120%;
-    min-width: 190px;
-    background: #fff;
-    box-shadow: 0 2px 10px #2223;
-    border-radius: 12px;
-    z-index: 1000;
+/* === FORUM LISTE MESSAGES === */
+.forum-list {
+    list-style: none;
     padding: 0;
     margin: 0;
-    font-size: 1rem;
 }
-.dropdown-menu a {
-    display: block;
-    padding: 12px 18px;
+.forum-message {
+    background: #fff;
+    border-radius: 13px;
+    box-shadow: 0 1px 9px #82cc9b16;
+    padding: 18px 20px 14px 22px;
+    margin-bottom: 24px;
+    border-left: 7px solid var(--green);
+    position: relative;
+    transition: box-shadow 0.2s;
+}
+.forum-message:hover {
+    box-shadow: 0 6px 24px #62b36e22;
+    border-left: 7px solid var(--green-dark);
+}
+.forum-message > div:first-child {
+    font-weight: 700;
+    color: var(--green-dark);
+    margin-bottom: 2px;
+}
+.forum-message > div:nth-child(2) {
+    font-style: italic;
+    color: #478053;
+    margin-bottom: 5px;
+}
+.forum-message > div:nth-child(3) {
+    margin: 7px 0 5px 0;
     color: #222;
-    text-decoration: none;
-    transition: background 0.2s;
-    border-bottom: 1px solid #f2f2f2;
 }
-.dropdown-menu a:last-child { border-bottom: none; }
-.dropdown-menu a:hover { background: #f4fbe8; }
+.forum-message button {
+    margin-top: 4px;
+    margin-right: 5px;
+    padding: 5px 16px;
+}
+.forum-message .repondre-btn {
+    background: var(--blue);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.98rem;
+    padding: 5px 18px;
+}
+.forum-message .repondre-btn:hover {
+    background: #144a94;
+}
+
+/* === FORUM REPONSES === */
+.forum-reponses {
+    list-style: none;
+    margin-top: 8px;
+    margin-bottom: 5px;
+    padding-left: 16px;
+}
+.forum-reponses li {
+    background: var(--green-light);
+    color: #18462b;
+    border-left: 3px solid var(--green);
+    border-radius: 7px;
+    padding: 8px 14px;
+    margin-bottom: 7px;
+    font-size: 0.99rem;
+    box-shadow: 0 1px 4px #d8f3e2;
+}
+.forum-reponses li b {
+    color: var(--green-dark);
+}
+.forum-reponses li span {
+    color: #666;
+    font-size: 0.96em;
+}
+
+.forum-reponses li button {
+    font-size: 0.89em;
+    margin-left: 8px;
+    background: #ffeaea;
+    color: #a22;
+    border-radius: 6px;
+    padding: 2px 11px;
+}
+.forum-reponses li button:hover {
+    background: #ffd3d3;
+    color: #700;
+}
+
+/* Formulaire de réponse */
+.reponse-form textarea {
+    border: 1px solid #b7e6c7;
+    border-radius: 6px;
+    font-family: 'Open Sans', Arial, sans-serif;
+    padding: 8px 10px;
+    font-size: 1rem;
+    background: #f5f9f6;
+    resize: vertical;
+}
+.reponse-form button[type="submit"] {
+    margin-top: 6px;
+    background: var(--green);
+    color: #fff;
+    border-radius: 8px;
+    padding: 5px 18px;
+    font-size: 0.97em;
+}
+.reponse-form button[type="submit"]:hover {
+    background: var(--green-dark);
+}
+
+#forum-form-section {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 12px #bce2cb2f;
+    padding: 24px 26px 20px 26px;
+    margin-bottom: 35px;
+}
+
+#forum-form select, #forum-form textarea {
+    border: 1.5px solid #bbe9c6;
+    border-radius: 7px;
+    padding: 9px 11px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+    background: #f9fcfb;
+    width: 100%;
+    max-width: 460px;
+}
+#forum-form select:focus, #forum-form textarea:focus {
+    outline: none;
+    border-color: var(--green-dark);
+    background: #f2fcf4;
+}
+#forum-form button[type="submit"] {
+    background: var(--green);
+    color: #fff;
+    border-radius: 12px;
+    padding: 8px 30px;
+    font-size: 1.04rem;
+    font-weight: 600;
+}
+#forum-form button[type="submit"]:hover {
+    background: var(--green-dark);
+}
+
+#forum-form-result {
+    color: var(--green-dark);
+    font-weight: 600;
+    margin-top: 13px;
+    margin-bottom: 0;
+}
+
+/* Responsive forum */
+@media (max-width: 800px) {
+    .forum-message, #forum-form-section { padding: 13px 7vw 10px 4vw; }
+}
+@media (max-width: 600px) {
+    .forum-message, #forum-form-section { padding: 9px 3vw 7px 2vw; }
+    .forum-message { font-size: 0.98em; }
+}
+
+/* =================== */
+/* AUTRES AMÉLIORATIONS */
+/* =================== */
+
+input[type="text"], input[type="number"], textarea, select {
+    border: 1.3px solid #bbdab8;
+    border-radius: 7px;
+    background: #f7faf7;
+    padding: 8px 10px;
+    font-size: 1rem;
+    transition: border-color 0.17s;
+}
+input[type="text"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--green-dark);
+    background: #f2fef7;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #b6dfb2;
+    border-radius: 7px;
+}
+::-webkit-scrollbar-track {
+    background: #f5f5f5;
+}
+
+/* --- Général --- */
+h2, h3 {
+    color: var(--green-dark);
+}
+a, a:visited {
+    color: #267f3b;
+}
+a:hover {
+    color: #1c5e2a;
+    text-decoration: underline;
+}
 
 footer {
-    text-align: center;
-    font-size: 0.98em;
-    color: #aaa;
+    background: #eafaf1;
+    color: #5a7957;
+    border-top: 1.5px solid #d2ecd9;
     margin-top: 50px;
-    padding: 24px 0;
+    padding: 28px 0 19px 0;
+    font-size: 0.99em;
+    letter-spacing: 1px;
 }
-ul { margin-top: 0.6em; }
+
