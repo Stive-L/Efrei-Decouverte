@@ -25,13 +25,17 @@
       </div>
   </header>
   <main>
-    <div class="tri-section">
+    <div class="tri-section" style="display:flex;align-items:center;gap:14px;">
       <label for="tri-destinations" style="font-weight:600; color:#267f3b;">Trier par :</label>
-      <select id="tri-destinations">
+      <select id="tri-destinations" style="font-weight:600; color:#267f3b;">
           <option value="default">-- Aucun --</option>
           <option value="langue">Langue</option>
           <option value="cout_vie_moyen">Coût de la vie</option>
           <option value="empreinte_carbone">Empreinte carbone</option>
+      </select>
+      <select id="tri-ordre" style="font-weight:600; color:#267f3b; border:1.2px solid #b0eac7; border-radius:8px; padding:6px 13px;">
+          <option value="asc">Croissant</option>
+          <option value="desc">Décroissant</option>
       </select>
     </div>
       <h2>Destinations proposées</h2>
@@ -134,19 +138,35 @@ function addStarListeners() {
 
 // Gestion du tri
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('tri-destinations').addEventListener('change', function() {
-    const critere = this.value;
+  const triSelect = document.getElementById('tri-destinations');
+  const ordreSelect = document.getElementById('tri-ordre');
+
+  function triEtAffiche() {
+    const critere = triSelect.value;
+    const ordre = ordreSelect.value;
     let sorted = [...allDestinations];
 
     if (critere === 'langue') {
       sorted.sort((a, b) => (a.langue || '').localeCompare(b.langue || ''));
+      // pas d'ordre inverse sur la langue
+      ordreSelect.disabled = true;
     } else if (critere === 'cout_vie_moyen') {
       sorted.sort((a, b) => (parseFloat(a.cout_vie_moyen) || 0) - (parseFloat(b.cout_vie_moyen) || 0));
+      ordreSelect.disabled = false;
+      if (ordre === 'desc') sorted.reverse();
     } else if (critere === 'empreinte_carbone') {
       sorted.sort((a, b) => (parseFloat(a.empreinte_carbone) || 0) - (parseFloat(b.empreinte_carbone) || 0));
+      ordreSelect.disabled = false;
+      if (ordre === 'desc') sorted.reverse();
+    } else {
+      ordreSelect.disabled = false;
     }
     renderDestinations(sorted);
-  });
+  }
+
+  triSelect.addEventListener('change', triEtAffiche);
+  ordreSelect.addEventListener('change', triEtAffiche);
+
   loadDestinationsWithFavoris();
 });
   </script>

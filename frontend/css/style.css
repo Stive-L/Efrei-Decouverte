@@ -906,3 +906,19 @@ button.modifier-avis-btn:hover {
     outline: none;
     background: #fafffd;
 }
+
+.tri-section select {
+    font-weight: 600;
+    color: #267f3b;
+    border: 1.2px solid #b0eac7;
+    border-radius: 8px;
+    padding: 6px 13px;
+    background: #f8fbf9;
+    transition: border-color 0.18s;
+    margin-right: 3px;
+}
+.tri-section select:disabled {
+    color: #aaa;
+    background: #f2f2f2;
+    cursor: not-allowed;
+}
