@@ -331,7 +331,7 @@ app.post('/api/avis/signaler', (req, res) => {
     return res.status(400).json({ success: false, error: "Données manquantes." });
   }
   db.query(
-    `INSERT INTO signalementavis (id_avis, id_utilisateur, motif, statut, date_signalement)
+    `INSERT INTO SignalementAvis (id_avis, id_utilisateur, motif, statut, date_signalement)
      VALUES (?, ?, ?, 'en_attente', NOW())`,
     [id_avis, id_utilisateur, motif],
     (err) => {
@@ -453,7 +453,7 @@ app.delete('/api/forum/reponse/:id_reponse', (req, res) => {
 app.get('/api/signalements', (req, res) => {
   const sql = `
     SELECT s.*, a.commentaire, a.id_avis, u.prenom, u.nom, d.universite, d.ville, d.pays
-    FROM signalementavis s
+    FROM SignalementAvis s
     JOIN avis a ON s.id_avis = a.id_avis
     JOIN utilisateur u ON a.id_utilisateur = u.id_utilisateur
     JOIN destination d ON a.id_destination = d.id_destination
@@ -471,7 +471,7 @@ app.post('/api/admin/signalement/valider', (req, res) => {
   // Suppression de l'avis + update du signalement
   db.query("DELETE FROM avis WHERE id_avis = ?", [id_avis], (err) => {
     if (err) return res.status(500).json({ success: false, error: "Erreur suppression avis" });
-    db.query("UPDATE signalementavis SET statut = 'traite' WHERE id_signalement = ?", [id_signalement], (err2) => {
+    db.query("UPDATE SignalementAvis SET statut = 'traite' WHERE id_signalement = ?", [id_signalement], (err2) => {
       if (err2) return res.status(500).json({ success: false, error: "Erreur statut signalement" });
       res.json({ success: true });
     });
@@ -481,7 +481,7 @@ app.post('/api/admin/signalement/valider', (req, res) => {
 // Ignorer un signalement (marquer traité mais garder l'avis)
 app.post('/api/admin/signalement/ignorer', (req, res) => {
   const { id_signalement } = req.body;
-  db.query("UPDATE signalementavis SET statut = 'traite' WHERE id_signalement = ?", [id_signalement], (err) => {
+  db.query("UPDATE SignalementAvis SET statut = 'traite' WHERE id_signalement = ?", [id_signalement], (err) => {
     if (err) return res.status(500).json({ success: false, error: "Erreur statut signalement" });
     res.json({ success: true });
   });
