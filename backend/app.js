@@ -469,7 +469,7 @@ app.get('/api/signalements', (req, res) => {
 app.post('/api/admin/signalement/valider', (req, res) => {
   const { id_signalement, id_avis } = req.body;
   // Suppression de l'avis + update du signalement
-  db.query("DELETE FROM avis WHERE id_avis = ?", [id_avis], (err) => {
+  db.query("DELETE FROM Avis WHERE id_avis = ?", [id_avis], (err) => {
     if (err) return res.status(500).json({ success: false, error: "Erreur suppression avis" });
     db.query("UPDATE SignalementAvis SET statut = 'traite' WHERE id_signalement = ?", [id_signalement], (err2) => {
       if (err2) return res.status(500).json({ success: false, error: "Erreur statut signalement" });
