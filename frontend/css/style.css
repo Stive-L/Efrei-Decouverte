@@ -709,15 +709,14 @@ button.supprimer-avis-btn:hover {
     font-weight: 600;
 }
 
-/* === BLOC POSTER UN AVIS === */
+/* === BLOC POSTER UN AVIS COMPACT === */
 #avis-form {
     background: #fafefb;
     border: 1.5px solid #b0eac7;
     border-radius: 14px;
     box-shadow: 0 2px 10px #8cd79013;
-    padding: 32px 35px 22px 35px;
-    margin-bottom: 40px;
-    max-width: 420px;
+    padding: 16px 18px 10px 18px; /* moins de padding */
+    max-width: 540px; /* plus étroit aussi si tu veux */
     margin-left: auto;
     margin-right: auto;
 }
@@ -725,33 +724,36 @@ button.supprimer-avis-btn:hover {
 #avis-form label {
     font-weight: 600;
     color: #267f3b;
-    margin-bottom: 6px;
+    margin-bottom: 3px; /* moins de marge */
     display: inline-block;
+    font-size: 0.98em;
 }
 
 #avis-form select,
 #avis-form textarea,
 #avis-form input[type="number"] {
     width: 100%;
-    margin-bottom: 16px;
+    margin-bottom: 8px; /* moins de marge */
     border-radius: 8px;
     border: 1.5px solid #b0eac7;
     background: #f6fcf8;
-    font-size: 1.07em;
-    padding: 8px 12px;
+    font-size: 1em;
+    padding: 5px 9px;  /* moins de padding */
     font-family: inherit;
     transition: border-color 0.18s;
     box-sizing: border-box;
 }
 
 #avis-form textarea {
-    min-height: 56px;
+    min-height: 30px; /* plus petit */
+    line-height: 1.25;
     resize: vertical;
 }
 
 #avis-form input[type="number"] {
-    max-width: 120px;
+    max-width: 95px;
     display: inline-block;
+    padding: 3px 8px;
 }
 
 #avis-form select:focus,
@@ -766,16 +768,16 @@ button.supprimer-avis-btn:hover {
     border: 1.2px solid #b0eac7;
     border-radius: 10px;
     background: #f8fbf9;
-    margin-bottom: 18px;
-    padding: 12px 18px 10px 18px;
+    margin-bottom: 8px; /* réduit */
+    padding: 7px 9px 5px 9px; /* moins de padding */
 }
 
 #avis-form legend {
     color: #267f3b;
-    font-size: 1.04em;
+    font-size: 0.98em;
     font-family: 'Cormorant Garamond', serif;
     font-weight: 700;
-    margin-bottom: 7px;
+    margin-bottom: 2px;
 }
 
 #avis-form input[type="submit"] {
@@ -783,14 +785,14 @@ button.supprimer-avis-btn:hover {
     color: #fff;
     border: none;
     border-radius: 8px;
-    font-size: 1.13em;
+    font-size: 1.06em;
     font-weight: 600;
-    padding: 10px 38px;
-    margin-top: 8px;
+    padding: 7px 24px;
+    margin-top: 4px;
     cursor: pointer;
     transition: background 0.18s;
     box-shadow: 0 2px 9px #62b36e15;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
 }
 #avis-form input[type="submit"]:hover {
     background: #267f3b;
