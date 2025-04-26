@@ -25,6 +25,15 @@
       </div>
   </header>
   <main>
+    <div class="tri-section">
+      <label for="tri-destinations" style="font-weight:600; color:#267f3b;">Trier par :</label>
+      <select id="tri-destinations">
+          <option value="default">-- Aucun --</option>
+          <option value="langue">Langue</option>
+          <option value="cout_vie_moyen">Coût de la vie</option>
+          <option value="empreinte_carbone">Empreinte carbone</option>
+      </select>
+    </div>
       <h2>Destinations proposées</h2>
       <ul class="dest-list" id="dest-list">
           <li>Chargement...</li>
@@ -38,85 +47,108 @@
   <script>
     // Récupère les destinations et gère les favoris
     const id_utilisateur = localStorage.getItem('id_utilisateur');
-    let favorisIds = [];
+let favorisIds = [];
+let allDestinations = [];
 
-    // Si connecté, on charge ses favoris avant d’afficher les destinations
-    function loadDestinationsWithFavoris() {
-      if (id_utilisateur) {
-        fetch(window.API_BASE_URL + "/api/favoris/" + id_utilisateur)
-          .then(res => res.json())
-          .then(favs => {
-            favorisIds = favs.map(f => f.id_destination);
-            loadDestinations();
-          })
-          .catch(() => loadDestinations());
-      } else {
+function loadDestinationsWithFavoris() {
+  if (id_utilisateur) {
+    fetch(window.API_BASE_URL + "/api/favoris/" + id_utilisateur)
+      .then(res => res.json())
+      .then(favs => {
+        favorisIds = favs.map(f => f.id_destination);
         loadDestinations();
+      })
+      .catch(() => loadDestinations());
+  } else {
+    loadDestinations();
+  }
+}
+
+function loadDestinations() {
+  fetch(window.API_BASE_URL + "/api/destinations")
+    .then(res => res.json())
+    .then(data => {
+      allDestinations = data;
+      renderDestinations(allDestinations);
+    })
+    .catch(() => {
+      document.getElementById('dest-list').innerHTML = "<li>Erreur lors du chargement des destinations.</li>";
+    });
+}
+
+function renderDestinations(list) {
+  const ul = document.getElementById('dest-list');
+  if (!list.length) {
+    ul.innerHTML = "<li>Aucune destination disponible.</li>";
+    return;
+  }
+  ul.innerHTML = "";
+  list.forEach(dest => {
+    const isFav = favorisIds.includes(dest.id_destination);
+    ul.innerHTML += `
+      <li data-id="${dest.id_destination}">
+        <div class="universite-row">
+          <span class="universite">${dest.universite}</span>
+          <button class="star-fav" title="Favori">${isFav ? '★' : '☆'}</button>
+        </div>
+        <div class="ville">${dest.ville}, ${dest.pays}</div>
+        <div>
+            Langue : ${dest.langue}
+            &nbsp; | &nbsp; Coût de la vie : ${dest.cout_vie_moyen} €
+            &nbsp; | &nbsp; Empreinte carbone : ${dest.empreinte_carbone ? dest.empreinte_carbone + " kg CO₂" : "N/A"}
+        </div>
+        <a class="btn-fiche" href="fiche_destination.html?id=${dest.id_destination}">Voir la fiche</a>
+      </li>
+    `;
+  });
+  addStarListeners();
+}
+
+function addStarListeners() {
+  document.querySelectorAll('.star-fav').forEach(star => {
+    star.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const li = this.closest('li');
+      const id_destination = li.getAttribute('data-id');
+      if (!id_utilisateur) {
+        alert("Vous devez être connecté pour ajouter une destination en favori !");
+        window.location.href = "login.html";
+        return;
       }
-    }
-
-    function loadDestinations() {
-      fetch(window.API_BASE_URL + "/api/destinations")
-        .then(res => res.json())
-        .then(data => {
-          const ul = document.getElementById('dest-list');
-          if (!data.length) {
-            ul.innerHTML = "<li>Aucune destination disponible.</li>";
-            return;
-          }
-          ul.innerHTML = "";
-          data.forEach(dest => {
-            const isFav = favorisIds.includes(dest.id_destination);
-            ul.innerHTML += `
-                <li data-id="${dest.id_destination}">
-                  <div class="universite-row">
-                    <span class="universite">${dest.universite}</span>
-                    <button class="star-fav" title="Favori">${isFav ? '★' : '☆'}</button>
-                  </div>
-                  <div class="ville">${dest.ville}, ${dest.pays}</div>
-                  <div>Langue : ${dest.langue} &nbsp; | &nbsp; Coût de la vie : ${dest.cout_vie_moyen} €</div>
-                  <a class="btn-fiche" href="fiche_destination.html?id=${dest.id_destination}">Voir la fiche</a>
-                </li>
-          `;
-          });
-          addStarListeners();
-        })
-        .catch(() => {
-          document.getElementById('dest-list').innerHTML = "<li>Erreur lors du chargement des destinations.</li>";
-        });
-    }
-
-    // Ajoute les listeners sur toutes les étoiles
-    function addStarListeners() {
-      document.querySelectorAll('.star-fav').forEach(star => {
-        star.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const li = this.closest('li');
-          const id_destination = li.getAttribute('data-id');
-          if (!id_utilisateur) {
-            alert("Vous devez être connecté pour ajouter une destination en favori !");
-            window.location.href = "login.html";
-            return;
-          }
-          fetch(window.API_BASE_URL + "/api/favoris", {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ id_utilisateur, id_destination })
-          })
-          .then(res => res.json())
-          .then(result => {
-            if (result.success) {
-              this.textContent = (this.textContent === '★') ? '☆' : '★';
-            } else {
-              alert("Erreur lors de l’ajout/retrait des favoris.");
-            }
-          });
-        });
+      fetch(window.API_BASE_URL + "/api/favoris", {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id_utilisateur, id_destination })
+      })
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          this.textContent = (this.textContent === '★') ? '☆' : '★';
+        } else {
+          alert("Erreur lors de l’ajout/retrait des favoris.");
+        }
       });
-    }
+    });
+  });
+}
 
-    // Chargement initial
-    loadDestinationsWithFavoris();
+// Gestion du tri
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('tri-destinations').addEventListener('change', function() {
+    const critere = this.value;
+    let sorted = [...allDestinations];
+
+    if (critere === 'langue') {
+      sorted.sort((a, b) => (a.langue || '').localeCompare(b.langue || ''));
+    } else if (critere === 'cout_vie_moyen') {
+      sorted.sort((a, b) => (parseFloat(a.cout_vie_moyen) || 0) - (parseFloat(b.cout_vie_moyen) || 0));
+    } else if (critere === 'empreinte_carbone') {
+      sorted.sort((a, b) => (parseFloat(a.empreinte_carbone) || 0) - (parseFloat(b.empreinte_carbone) || 0));
+    }
+    renderDestinations(sorted);
+  });
+  loadDestinationsWithFavoris();
+});
   </script>
 </body>
 </html>

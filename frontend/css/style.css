@@ -883,3 +883,26 @@ button.modifier-avis-btn:hover {
 #mes-avis-list span {
     color: #212;
 }
+
+.tri-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 24px 0 22px 0;
+}
+#tri-destinations {
+    padding: 8px 15px;
+    border-radius: 8px;
+    border: 1.3px solid #b0eac7;
+    background: #f6fcf8;
+    font-size: 1.05em;
+    color: #267f3b;
+    font-family: inherit;
+    font-weight: 600;
+    transition: border-color 0.18s;
+}
+#tri-destinations:focus {
+    border-color: #62b36e;
+    outline: none;
+    background: #fafffd;
+}
