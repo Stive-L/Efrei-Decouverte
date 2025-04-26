@@ -552,7 +552,19 @@ app.post('/api/register', (req, res) => {
   });
 });
 
-
+app.put('/api/avis/:id', (req, res) => {
+  const { commentaire, notes } = req.body;
+  const { id } = req.params;
+  if (!commentaire || !notes) return res.json({ success: false, error: "Champs manquants" });
+  db.query(
+    'UPDATE Avis SET commentaire = ?, qualite_cours = ?, logement = ?, climat = ?, vie_locale = ?, accessibilite = ? WHERE id_avis = ?',
+    [commentaire, notes.qualite_cours, notes.logement, notes.climat, notes.vie_locale, notes.accessibilite, id],
+    (err) => {
+      if (err) return res.json({ success: false, error: "Erreur MySQL" });
+      res.json({ success: true });
+    }
+  );
+});
 
 
 // ==========================

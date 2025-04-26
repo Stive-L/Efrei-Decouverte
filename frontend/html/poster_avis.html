@@ -62,7 +62,29 @@
     </section>
   </main>
 
-  <!-- Mets config.js AVANT tes autres scripts/appels ! -->
+  <!-- POPUP MODIFIER AVIS -->
+  <div id="popup-modifier-avis" style="display:none; position:fixed; left:0;top:0;width:100vw;height:100vh;background:#0004;z-index:1000;align-items:center;justify-content:center;">
+    <div style="background:#fff;padding:30px 20px;border-radius:18px;min-width:340px;box-shadow:0 8px 48px #0003;position:relative;">
+      <h3>Modifier mon avis</h3>
+      <form id="form-modif-avis">
+        <textarea id="modif-commentaire" required style="width:100%;min-height:60px;margin:10px 0 18px 0;"></textarea>
+        <fieldset>
+          <legend>Notes (sur 5) :</legend>
+          <label>Qualité des cours : <input type="number" id="modif-qualite_cours" min="1" max="5" required></label><br>
+          <label>Logement : <input type="number" id="modif-logement" min="1" max="5" required></label><br>
+          <label>Climat : <input type="number" id="modif-climat" min="1" max="5" required></label><br>
+          <label>Vie locale : <input type="number" id="modif-vie_locale" min="1" max="5" required></label><br>
+          <label>Accessibilité : <input type="number" id="modif-accessibilite" min="1" max="5" required></label><br>
+        </fieldset>
+        <div style="text-align:right;">
+          <button type="button" onclick="fermerPopupModifAvis()" style="margin-right:8px; background:#f3f3f3; color:#333; border:none; padding:6px 18px; border-radius:8px; font-weight:500; cursor:pointer; transition:background 0.17s;">Annuler</button>
+          <button type="submit" style="background:#62b36e;color:white;border:none;padding:6px 18px;border-radius:8px;">Enregistrer</button>
+        </div>
+        <input type="hidden" id="modif-id-avis">
+      </form>
+    </div>
+  </div>
+
   <script src="../js/config.js"></script>
   <script src="../js/connexion.js"></script>
   <script>
@@ -112,7 +134,10 @@
         document.getElementById('avis-result').textContent = result.success 
           ? "Votre avis a bien été enregistré, merci !" 
           : ("Erreur : " + (result.error || "Impossible d’enregistrer l’avis."));
-        if(result.success) form.reset();
+        if(result.success) {
+          form.reset();
+          chargerMesAvis();
+        }
       })
       .catch(() => {
         document.getElementById('avis-result').textContent = "Erreur serveur, réessayez plus tard.";
@@ -134,11 +159,13 @@
           }
           ul.innerHTML = '';
           avisList.forEach(avis => {
+            // Ajout du bouton modifier
             ul.innerHTML += `
               <li style="margin-bottom:15px;">
                   <strong>${avis.universite}</strong> — ${avis.ville}, ${avis.pays}<br>
                   <span><em>${avis.code_type}</em> (${avis.annee_mobilite})</span><br>
                   <span>${avis.commentaire}</span><br>
+                  <button class="modifier-avis-btn" data-avis='${JSON.stringify(avis)}'>Modifier</button>
                   <button class="supprimer-avis-btn" data-id="${avis.id_avis}">Supprimer</button>
               </li>
             `;
@@ -165,6 +192,58 @@
 
     // Appeler la fonction au chargement de la page
     chargerMesAvis();
+
+    // MODIFIER UN AVIS
+    document.body.addEventListener('click', function(e) {
+      if (e.target.classList.contains('modifier-avis-btn')) {
+        const avis = JSON.parse(e.target.dataset.avis);
+
+        document.getElementById('modif-id-avis').value = avis.id_avis;
+        document.getElementById('modif-commentaire').value = avis.commentaire;
+        document.getElementById('modif-qualite_cours').value = avis.qualite_cours;
+        document.getElementById('modif-logement').value = avis.logement;
+        document.getElementById('modif-climat').value = avis.climat;
+        document.getElementById('modif-vie_locale').value = avis.vie_locale;
+        document.getElementById('modif-accessibilite').value = avis.accessibilite;
+
+        document.getElementById('popup-modifier-avis').style.display = 'flex';
+      }
+    });
+
+    function fermerPopupModifAvis() {
+      document.getElementById('popup-modifier-avis').style.display = 'none';
+    }
+
+    // Envoie la modif (PUT)
+    document.getElementById('form-modif-avis').onsubmit = function(e) {
+      e.preventDefault();
+      const id_avis = document.getElementById('modif-id-avis').value;
+      const data = {
+        commentaire: document.getElementById('modif-commentaire').value,
+        notes: {
+          qualite_cours: document.getElementById('modif-qualite_cours').value,
+          logement: document.getElementById('modif-logement').value,
+          climat: document.getElementById('modif-climat').value,
+          vie_locale: document.getElementById('modif-vie_locale').value,
+          accessibilite: document.getElementById('modif-accessibilite').value,
+        }
+      };
+
+      fetch(window.API_BASE_URL + '/api/avis/' + id_avis, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(result => {
+        if(result.success) {
+          fermerPopupModifAvis();
+          chargerMesAvis();
+        } else {
+          alert("Erreur lors de la modification");
+        }
+      });
+    };
   </script>
 </body>
 </html>
