@@ -528,11 +528,26 @@ app.post('/api/register', (req, res) => {
   db.query('SELECT * FROM Utilisateur WHERE email = ?', [email], (err, rows) => {
     if (err) return res.status(500).json({ success: false, error: "Erreur MySQL" });
     if (rows.length) return res.json({ success: false, error: "Email déjà utilisé." });
-    // Insère le nouvel utilisateur (role = 2 par défaut)
-    db.query('INSERT INTO Utilisateur (prenom, nom, email, mot_de_passe, id_role) VALUES (?, ?, ?, ?, 2)', 
-      [prenom, nom, email, password], (err2) => {
-        if (err2) return res.status(500).json({ success: false, error: "Erreur MySQL (insert)" });
-        res.json({ success: true });
+
+    // Récupère le dernier myefrei_id pour incrémenter
+    db.query('SELECT myefrei_id FROM Utilisateur ORDER BY id_utilisateur DESC LIMIT 1', (err2, rows2) => {
+      let newId = 1;
+      if (!err2 && rows2.length > 0) {
+        const lastId = parseInt(rows2[0].myefrei_id.replace('efrei', ''), 10);
+        newId = lastId + 1;
+      }
+      const myefrei_id = `efrei${String(newId).padStart(3, '0')}`;
+      db.query(
+        'INSERT INTO Utilisateur (myefrei_id, prenom, nom, email, mot_de_passe, id_role) VALUES (?, ?, ?, ?, ?, 2)',
+        [myefrei_id, prenom, nom, email, password],
+        (err3) => {
+          if (err3) {
+            console.error("Erreur MySQL (insert):", err3);
+            return res.status(500).json({ success: false, error: "Erreur MySQL (insert): " + err3.sqlMessage });
+          }
+          res.json({ success: true });
+        }
+      );
     });
   });
 });
