@@ -31,87 +31,75 @@
             font-weight: bold;
             color: #144a94;
         }
-        /* Pour garder la même largeur de la box même en mode register */
         .tab-form {
             display: none;
             flex-direction: column;
-            gap: 0;
         }
         .tab-form.active {
             display: flex;
         }
-        .register-form {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.register-form label {
-    display: block;
-    margin-bottom: 6px;
-    color: #222;
-    font-weight: 600;
-    font-size: 1.04rem;
-}
-
-.register-form input[type="text"],
-.register-form input[type="password"] {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 7px;
-    font-size: 1rem;
-    margin-bottom: 18px;
-    font-family: 'Open Sans', Arial, sans-serif;
-    background: #eaf2fd;
-    transition: border-color 0.2s;
-}
-
-.register-form input[type="text"]:focus,
-.register-form input[type="password"]:focus {
-    outline: none;
-    border-color: #2b63c1;
-    background: #f4f9ff;
-}
-
-.register-form input[type="submit"] {
-    width: 100%;
-    padding: 13px 0;
-    background: #62b36e;
-    color: #fff;
-    border: none;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 1.08rem;
-    transition: background 0.2s;
-    cursor: pointer;
-    margin-top: 4px;
-}
-
-.register-form input[type="submit"]:hover {
-    background: #3d8242;
-}
-
-.register-error {
-    color: #a22424;
-    background: #ffeaea;
-    border-radius: 8px;
-    padding: 9px 13px;
-    margin-bottom: 14px;
-    text-align: center;
-    font-size: 0.99rem;
-    display: none;
-}
-.register-success {
-    color: #21743a;
-    background: #e7fae6;
-    border-radius: 8px;
-    padding: 9px 13px;
-    margin-bottom: 14px;
-    text-align: center;
-    font-size: 0.99rem;
-    display: none;
-}
+        /* Styles register form */
+        .register-form label {
+            display: block;
+            margin-bottom: 6px;
+            color: #222;
+            font-weight: 600;
+            font-size: 1.04rem;
+        }
+        .register-form input[type="text"],
+        .register-form input[type="password"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 1rem;
+            margin-bottom: 18px;
+            font-family: 'Open Sans', Arial, sans-serif;
+            background: #eaf2fd;
+            transition: border-color 0.2s;
+        }
+        .register-form input[type="text"]:focus,
+        .register-form input[type="password"]:focus {
+            outline: none;
+            border-color: #2b63c1;
+            background: #f4f9ff;
+        }
+        .register-form input[type="submit"] {
+            width: 100%;
+            padding: 13px 0;
+            background: #62b36e;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 1.08rem;
+            transition: background 0.2s;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+        .register-form input[type="submit"]:hover {
+            background: #3d8242;
+        }
+        .register-error {
+            color: #a22424;
+            background: #ffeaea;
+            border-radius: 8px;
+            padding: 9px 13px;
+            margin-bottom: 14px;
+            text-align: center;
+            font-size: 0.99rem;
+            display: none;
+        }
+        .register-success {
+            color: #21743a;
+            background: #e7fae6;
+            border-radius: 8px;
+            padding: 9px 13px;
+            margin-bottom: 14px;
+            text-align: center;
+            font-size: 0.99rem;
+            display: none;
+        }
         @media (max-width: 600px) {
             .login-container { padding: 15px 4vw; }
             .tabs-login button { padding: 9px 10px; font-size: 15px; }
@@ -168,6 +156,14 @@
 <script src="../js/config.js"></script>
 <script src="../js/connexion.js"></script>
 <script>
+    // SÉCURITÉ : Affiche que le bon form au chargement
+    window.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.tab-form').forEach(f => f.classList.remove('active'));
+        document.getElementById('login-form').classList.add('active');
+        document.getElementById('tab-login').classList.add('active');
+        document.getElementById('tab-register').classList.remove('active');
+    });
+
     // Onglets Connexion / Inscription
     const tabLogin = document.getElementById('tab-login');
     const tabRegister = document.getElementById('tab-register');
