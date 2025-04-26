@@ -454,9 +454,9 @@ app.get('/api/signalements', (req, res) => {
   const sql = `
     SELECT s.*, a.commentaire, a.id_avis, u.prenom, u.nom, d.universite, d.ville, d.pays
     FROM SignalementAvis s
-    JOIN avis a ON s.id_avis = a.id_avis
-    JOIN utilisateur u ON a.id_utilisateur = u.id_utilisateur
-    JOIN destination d ON a.id_destination = d.id_destination
+    JOIN Avis a ON s.id_avis = a.id_avis
+    JOIN Utilisateur u ON a.id_utilisateur = u.id_utilisateur
+    JOIN Destination d ON a.id_destination = d.id_destination
     ORDER BY s.date_signalement DESC
   `;
   db.query(sql, (err, results) => {
