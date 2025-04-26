@@ -103,7 +103,7 @@
                   <b>${msg.prenom} ${msg.nom}</b> — <span style="color:#888">${new Date(msg.date_message).toLocaleDateString('fr-FR')}</span>
                   ${
                     msg.id_utilisateur == id_utilisateur
-                      ? `<button onclick="supprimerMessage(${msg.id_message})" style="color:#a22;margin-left:12px;">Supprimer</button>`
+                      ? `<button onclick="supprimerMessage(${msg.id_message})" class="supprimer-btn">Supprimer</button>`
                       : ''
                   }
                 </div>
@@ -120,7 +120,7 @@
                           <b>${rep.prenom} ${rep.nom}</b> — <span style="color:#aaa">${new Date(rep.date_reponse).toLocaleDateString('fr-FR')}</span>
                           ${
                             rep.id_utilisateur == id_utilisateur
-                              ? `<button onclick="supprimerReponse(${rep.id_reponse})" style="color:#a22;margin-left:8px;">Supprimer</button>`
+                              ? `<button onclick="supprimerReponse(${rep.id_reponse})" class="supprimer-btn">Supprimer</button>`
                               : ''
                           }
                           <br>
