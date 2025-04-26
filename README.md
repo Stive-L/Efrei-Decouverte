@@ -7,7 +7,7 @@ Projet Green IT – minimisation de l’empreinte carbone web.
 
 ## Lien du site
 
-- **Site (Cloud):** https://efrei-and-decouverte-front-production.up.railway.app  
+- **Site (Cloud):** https://efrei-and-decouverte.up.railway.app
 - **Back-end (BDD) :** https://efrei-and-decouverte-back-production.up.railway.app
 
 ---
