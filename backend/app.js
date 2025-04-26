@@ -11,21 +11,27 @@ app.use(express.json());
 // ==========================
 //   Connexion à la BDD
 // ==========================
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: process.env.MYSQLHOST,
   user: process.env.MYSQLUSER,
   password: process.env.MYSQLPASSWORD,
   database: process.env.MYSQLDATABASE,
-  port: process.env.MYSQLPORT
+  port: process.env.MYSQLPORT,
+  waitForConnections: true,
+  connectionLimit: 10,   
+  queueLimit: 0
 });
 
-db.connect((err) => {
+// Pour vérifier que ça marche (optionnel)
+db.getConnection((err, connection) => {
   if (err) {
     console.error('Erreur de connexion à MySQL :', err.message);
   } else {
-    console.log('✅ Connecté à la base MySQL efrei_decouverte !');
+    console.log('✅ Pool MySQL prêt !');
+    connection.release();
   }
 });
+
 
 // ==========================
 //   ROUTES DESTINATIONS
