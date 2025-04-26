@@ -621,3 +621,90 @@ ul { margin-top: 0.6em; }
         font-size: 0.96em;
     }
 }
+
+/* === BOUTON SUPPRIMER FORUM GreenIT === */
+.forum-message .supprimer-btn,
+.forum-reponses .supprimer-btn,
+button.supprimer-avis-btn {
+    background: #ffeded;
+    color: #b93d3d;
+    border: none;
+    border-radius: 8px;
+    padding: 3px 13px 4px 13px;
+    font-size: 0.99em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 5px;
+    margin-right: 2px;
+    box-shadow: 0 1px 3px #b93d3d12;
+    transition: background 0.13s, color 0.13s;
+}
+.forum-message .supprimer-btn:hover,
+.forum-reponses .supprimer-btn:hover,
+button.supprimer-avis-btn:hover {
+    background: #ffc8c8;
+    color: #a41a1a;
+}
+
+/* === BLOC POSTER UN NOUVEAU MESSAGE GreenIT === */
+#forum-form-section {
+    background: #fafefb;
+    border: 1.5px solid #b0eac7;
+    border-radius: 13px;
+    box-shadow: 0 2px 9px #8cd79013;
+    padding: 30px 30px 20px 30px;
+    margin-top: 44px;
+    max-width: 600px;
+}
+#forum-form-section h3 {
+    margin-top: 0;
+    color: #267f3b;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.33rem;
+}
+#forum-form label {
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 5px;
+    display: inline-block;
+}
+#forum-form select,
+#forum-form textarea {
+    width: 100%;
+    margin-bottom: 14px;
+    border-radius: 8px;
+    border: 1.5px solid #b0eac7;
+    background: #f6fcf8;
+    font-size: 1.03em;
+    padding: 8px 12px;
+    font-family: inherit;
+    transition: border-color 0.18s;
+    box-sizing: border-box;
+}
+#forum-form textarea:focus,
+#forum-form select:focus {
+    border-color: #62b36e;
+    outline: none;
+    background: #fafffd;
+}
+#forum-form button[type="submit"] {
+    background: #62b36e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.09em;
+    font-weight: 600;
+    padding: 8px 28px;
+    margin-top: 4px;
+    cursor: pointer;
+    transition: background 0.18s;
+    box-shadow: 0 2px 9px #62b36e19;
+}
+#forum-form button[type="submit"]:hover {
+    background: #267f3b;
+}
+#forum-form-result {
+    margin-top: 10px;
+    color: #267f3b;
+    font-weight: 600;
+}
