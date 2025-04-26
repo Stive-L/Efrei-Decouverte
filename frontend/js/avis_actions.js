@@ -82,7 +82,7 @@ function showPopupSignalementHTML() {
         <textarea id="motif-signalement" required style="width:100%;min-height:60px;margin:10px 0 18px 0;"></textarea>
         <div style="text-align:right;">
           <button type="button" onclick="closePopupSignalement()" style="margin-right:8px;background:#f3f3f3;color:#333;border:none;padding:6px 18px;border-radius:8px;font-weight:500;cursor:pointer;transition:background 0.17s;">Annuler</button>
-          <button type="submit" style="background:#ff6d6d;color:white;border:none;padding:6px 18px;border-radius:8px;">Envoyer</button>
+          <button type="submit" style="background:#ff6d6d;color:white;border:none;padding:6px 18px;border-radius:8px;cursor:pointer;">Envoyer</button>
         </div>
       </form>
     </div>
