@@ -7,8 +7,33 @@
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700;500&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        .tabs-login {
+            display: flex;
+            justify-content: center;
+            margin: 32px 0 22px 0;
+        }
+        .tabs-login button {
+            font-family: inherit;
+            background: #f2f2f2;
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 12px 28px;
+            margin: 0 4px;
+            font-size: 18px;
+            cursor: pointer;
+            color: #222;
+            border-radius: 10px 10px 0 0;
+            transition: 0.2s;
+        }
+        .tabs-login button.active {
+            border-bottom: 3px solid #2b63c1;
+            background: #fff;
+            font-weight: bold;
+            color: #144a94;
+        }
         @media (max-width: 600px) {
-            .login-container { padding: 16px 7vw; margin-top: 85px; }
+            .login-container { padding: 18px 6vw; }
+            .tabs-login button { padding: 10px 10px; font-size: 15px; }
         }
     </style>
 </head>
@@ -27,7 +52,11 @@
 </header>
 <main>
     <div class="login-container">
-        <h2>Connexion</h2>
+        <div class="tabs-login">
+            <button id="tab-login" class="active" type="button">Connexion</button>
+            <button id="tab-register" type="button">Créer un compte</button>
+        </div>
+        <!-- Login -->
         <form class="login-form" id="login-form" autocomplete="on">
             <div class="login-error" id="login-error"></div>
             <label for="email">Adresse email EFREI</label>
@@ -35,6 +64,20 @@
             <label for="password">Mot de passe</label>
             <input type="password" id="password" name="password" placeholder="Mot de passe" required autocomplete="current-password">
             <input type="submit" value="Se connecter">
+        </form>
+        <!-- Register -->
+        <form class="register-form" id="register-form" style="display:none">
+            <div class="register-error" id="register-error"></div>
+            <div class="register-success" id="register-success"></div>
+            <label for="prenom">Prénom</label>
+            <input type="text" id="prenom" name="prenom" required>
+            <label for="nom">Nom</label>
+            <input type="text" id="nom" name="nom" required>
+            <label for="register-email">Adresse email EFREI</label>
+            <input type="text" id="register-email" name="email" placeholder="prenom.nom@efrei.net" required>
+            <label for="register-password">Mot de passe</label>
+            <input type="password" id="register-password" name="password" required>
+            <input type="submit" value="Créer le compte">
         </form>
     </div>
 </main>
@@ -44,46 +87,104 @@
 <script src="../js/config.js"></script>
 <script src="../js/connexion.js"></script>
 <script>
-const form = document.getElementById('login-form');
-const errorDiv = document.getElementById('login-error');
-
-form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    errorDiv.style.display = "none";
-    const email = form.email.value.trim();
-    const password = form.password.value;
-
-    if (!email || !password) {
-        errorDiv.textContent = "Merci de remplir tous les champs !";
-        errorDiv.style.display = "block";
-        return;
+    // --- Onglets Connexion / Inscription
+    document.getElementById('tab-login').onclick = function() {
+        this.classList.add('active');
+        document.getElementById('tab-register').classList.remove('active');
+        document.getElementById('login-form').style.display = "flex";
+        document.getElementById('register-form').style.display = "none";
+    }
+    document.getElementById('tab-register').onclick = function() {
+        this.classList.add('active');
+        document.getElementById('tab-login').classList.remove('active');
+        document.getElementById('login-form').style.display = "none";
+        document.getElementById('register-form').style.display = "flex";
     }
 
-    // Utilise la bonne URL selon l'env via config.js !
-    fetch(window.API_BASE_URL + '/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            // Stocker les infos utilisateur AVANT de rediriger
-            localStorage.setItem('nom', data.nom);
-            localStorage.setItem('prenom', data.prenom);
-            localStorage.setItem('id_role', data.id_role); // Utilise bien id_role (côté back) !
-            localStorage.setItem('id_utilisateur', data.id_utilisateur);
-            window.location.href = "../index.html"; // Redirection APRÈS stockage
-        } else {
-            errorDiv.textContent = data.error || "Identifiants incorrects";
-            errorDiv.style.display = "block";
+    // --- Connexion
+    const loginForm = document.getElementById('login-form');
+    const loginErrorDiv = document.getElementById('login-error');
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        loginErrorDiv.style.display = "none";
+        const email = loginForm.email.value.trim();
+        const password = loginForm.password.value;
+        if (!email || !password) {
+            loginErrorDiv.textContent = "Merci de remplir tous les champs !";
+            loginErrorDiv.style.display = "block";
+            return;
         }
-    })
-    .catch(() => {
-        errorDiv.textContent = "Erreur de connexion au serveur.";
-        errorDiv.style.display = "block";
+        fetch(window.API_BASE_URL + '/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                localStorage.setItem('nom', data.nom);
+                localStorage.setItem('prenom', data.prenom);
+                localStorage.setItem('id_role', data.id_role);
+                localStorage.setItem('id_utilisateur', data.id_utilisateur);
+                window.location.href = "../index.html";
+            } else {
+                loginErrorDiv.textContent = data.error || "Identifiants incorrects";
+                loginErrorDiv.style.display = "block";
+            }
+        })
+        .catch(() => {
+            loginErrorDiv.textContent = "Erreur de connexion au serveur.";
+            loginErrorDiv.style.display = "block";
+        });
     });
-});
+
+    // --- Inscription
+    const registerForm = document.getElementById('register-form');
+    const registerErrorDiv = document.getElementById('register-error');
+    const registerSuccessDiv = document.getElementById('register-success');
+    registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        registerErrorDiv.style.display = "none";
+        registerSuccessDiv.style.display = "none";
+        const prenom = registerForm.prenom.value.trim();
+        const nom = registerForm.nom.value.trim();
+        const email = registerForm['register-email'].value.trim();
+        const password = registerForm['register-password'].value;
+
+        // Vérification email EFREI
+        if (!email.endsWith("@efrei.net")) {
+            registerErrorDiv.textContent = "Seuls les mails @efrei.net sont autorisés.";
+            registerErrorDiv.style.display = "block";
+            return;
+        }
+        if (!prenom || !nom || !email || !password) {
+            registerErrorDiv.textContent = "Merci de remplir tous les champs !";
+            registerErrorDiv.style.display = "block";
+            return;
+        }
+
+        fetch(window.API_BASE_URL + '/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prenom, nom, email, password })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                registerSuccessDiv.textContent = "Compte créé ! Vous pouvez maintenant vous connecter.";
+                registerSuccessDiv.style.display = "block";
+                registerErrorDiv.style.display = "none";
+                registerForm.reset();
+            } else {
+                registerErrorDiv.textContent = data.error || "Erreur lors de la création du compte.";
+                registerErrorDiv.style.display = "block";
+            }
+        })
+        .catch(() => {
+            registerErrorDiv.textContent = "Erreur lors de l'inscription.";
+            registerErrorDiv.style.display = "block";
+        });
+    });
 </script>
 </body>
 </html>

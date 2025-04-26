@@ -516,6 +516,26 @@ app.post('/api/destinations', (req, res) => {
 });
 
 
+app.post('/api/register', (req, res) => {
+  const { prenom, nom, email, password } = req.body;
+  if (!prenom || !nom || !email || !password) {
+    return res.status(400).json({ success: false, error: "Tous les champs sont requis." });
+  }
+  if (!email.endsWith("@efrei.net")) {
+    return res.status(400).json({ success: false, error: "Seuls les mails @efrei.net sont autorisés." });
+  }
+  // Vérifie si déjà existant
+  db.query('SELECT * FROM Utilisateur WHERE email = ?', [email], (err, rows) => {
+    if (err) return res.status(500).json({ success: false, error: "Erreur MySQL" });
+    if (rows.length) return res.json({ success: false, error: "Email déjà utilisé." });
+    // Insère le nouvel utilisateur (role = 2 par défaut)
+    db.query('INSERT INTO Utilisateur (prenom, nom, email, mot_de_passe, id_role) VALUES (?, ?, ?, ?, 2)', 
+      [prenom, nom, email, password], (err2) => {
+        if (err2) return res.status(500).json({ success: false, error: "Erreur MySQL (insert)" });
+        res.json({ success: true });
+    });
+  });
+});
 
 
 
