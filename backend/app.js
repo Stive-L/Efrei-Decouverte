@@ -344,11 +344,11 @@ app.post('/api/avis/signaler', (req, res) => {
 
 app.get('/api/forum', (req, res) => {
   db.query(
-    `SELECT f.*, d.universite, d.ville, d.pays, u.prenom, u.nom
-     FROM ForumDestination f
-     LEFT JOIN Destination d ON f.id_destination = d.id_destination
-     LEFT JOIN Utilisateur u ON f.id_utilisateur = u.id_utilisateur
-     ORDER BY f.date_message DESC`,
+    `SELECT f.*, d.universite, d.ville, d.pays, u.prenom, u.nom, u.id_role
+    FROM ForumDestination f
+    LEFT JOIN Destination d ON f.id_destination = d.id_destination
+    LEFT JOIN Utilisateur u ON f.id_utilisateur = u.id_utilisateur
+    ORDER BY f.date_message DESC`,
     (err, rows) => {
       if (err) {
         console.error('Erreur /api/forum :', err);
@@ -380,7 +380,7 @@ app.post('/api/forum', (req, res) => {
 app.get('/api/forum/:id_message/reponses', (req, res) => {
   const id = req.params.id_message;
   db.query(`
-    SELECT r.*, u.prenom, u.nom
+    SELECT r.*, u.prenom, u.nom, u.id_role
     FROM forum_reponse r
     JOIN Utilisateur u ON r.id_utilisateur = u.id_utilisateur
     WHERE r.id_message = ?

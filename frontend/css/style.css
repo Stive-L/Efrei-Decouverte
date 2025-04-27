@@ -922,3 +922,14 @@ button.modifier-avis-btn:hover {
     background: #f2f2f2;
     cursor: not-allowed;
 }
+
+.admin-label {
+    color: #267f3b;
+    font-size: 0.98em;
+    font-weight: 700;
+    margin-left: 6px;
+    background: #eafaf1;
+    border-radius: 7px;
+    padding: 1px 7px;
+    letter-spacing: 0.5px;
+}

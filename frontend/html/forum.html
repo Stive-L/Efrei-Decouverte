@@ -100,7 +100,10 @@
             html += `
               <li class="forum-message" style="margin-bottom:30px;">
                 <div>
-                  <b>${msg.prenom} ${msg.nom}</b> — <span style="color:#888">${new Date(msg.date_message).toLocaleDateString('fr-FR')}</span>
+                  <b>
+                    ${msg.prenom} ${msg.nom}
+                    ${msg.id_role == 1 ? '<span class="admin-label">(Administrateur)</span>' : ''}
+                  </b> — <span style="color:#888">${new Date(msg.date_message).toLocaleDateString('fr-FR')}</span>
                   ${
                     msg.id_utilisateur == id_utilisateur
                       ? `<button onclick="supprimerMessage(${msg.id_message})" class="supprimer-btn">Supprimer</button>`
