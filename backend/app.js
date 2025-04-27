@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt'); // Ajoute bien ce require en haut !
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = 3000;
