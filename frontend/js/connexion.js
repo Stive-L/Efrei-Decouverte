@@ -6,6 +6,9 @@ window.addEventListener('DOMContentLoaded', function() {
     const prenom = localStorage.getItem('prenom');
     const role = localStorage.getItem('id_role'); 
 
+    
+    if (!loginLink) return;
+
     // Fonction pour obtenir le bon chemin selon la page courante
     function linkTo(page) {
         const isInHtmlFolder = window.location.pathname.includes('/html/');
