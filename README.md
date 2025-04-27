@@ -78,8 +78,6 @@ git clone https://github.com/votre-utilisateur/efrei-decouverte.git
 cd efrei-decouverte
 ```
 
----
-
 ### ⚡ 2. Utilisation recommandée (hébergée)
 
 - **Il n'est plus nécessaire de lancer le back-end ou la base de données en local.**
