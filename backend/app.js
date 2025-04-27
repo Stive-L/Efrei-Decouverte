@@ -2,12 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt'); // Ajoute bien ce require en haut !
 
 const app = express();
 const PORT = 3000;
+const SALT_ROUNDS = 10;
 
-// À changer par un vrai secret en prod !
-const JWT_SECRET = process.env.JWT_SECRET || 'vraiment_change_ceci_en_prod';
+const JWT_SECRET = process.env.JWT_SECRET || 'vrai_mot_de_passe_de_bonhomme';
 
 app.use(cors({
   origin: 'https://efrei-test.up.railway.app'
@@ -28,6 +29,21 @@ const db = mysql.createPool({
   queueLimit: 0
 });
 
+function sendJwt(res, user) {
+  const payload = {
+    id_utilisateur: user.id_utilisateur,
+    nom: user.nom,
+    prenom: user.prenom,
+    email: user.email,
+    id_role: user.id_role
+  };
+  const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+  res.json({
+    success: true,
+    token,
+    user: payload
+  });
+}
 
 // Pour vérifier que ça marche (optionnel)
 db.getConnection((err, connection) => {
@@ -132,31 +148,40 @@ app.get('/api/avis', (req, res) => {
 
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
-  const sql = `SELECT id_utilisateur, nom, prenom, email, mot_de_passe, id_role FROM Utilisateur WHERE email = ? LIMIT 1`;
+  const sql = `SELECT id_utilisateur, nom, prenom, email, mot_de_passe, id_role, is_hashed FROM Utilisateur WHERE email = ? LIMIT 1`;
 
   db.query(sql, [email], (err, results) => {
     if (err) return res.status(500).json({ success: false, error: "Erreur MySQL" });
     if (results.length === 0) return res.json({ success: false, error: "Email ou mot de passe incorrect" });
 
     const user = results[0];
-    if (user.mot_de_passe !== password) return res.json({ success: false, error: "Email ou mot de passe incorrect" });
 
-    // JWT payload : ne JAMAIS inclure le mot de passe
-    const payload = {
-      id_utilisateur: user.id_utilisateur,
-      nom: user.nom,
-      prenom: user.prenom,
-      email: user.email,
-      id_role: user.id_role
-    };
-
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
-
-    res.json({
-      success: true,
-      token, // Le frontend doit stocker ce token (pas dans localStorage, mais dans memory/cookie sécurisé idéalement)
-      user: payload
-    });
+    // Mot de passe déjà hashé
+    if (user.is_hashed == 1) {
+      bcrypt.compare(password, user.mot_de_passe, (errCompare, isMatch) => {
+        if (errCompare) return res.status(500).json({ success: false, error: "Erreur serveur" });
+        if (!isMatch) return res.json({ success: false, error: "Email ou mot de passe incorrect" });
+        return sendJwt(res, user);
+      });
+    } else {
+      // Ancien mot de passe (en clair)
+      if (password !== user.mot_de_passe) {
+        return res.json({ success: false, error: "Email ou mot de passe incorrect" });
+      }
+      // Migrer ce compte à bcrypt (en asynchrone)
+      bcrypt.hash(password, SALT_ROUNDS, (errHash, hashedPassword) => {
+        if (errHash) return res.status(500).json({ success: false, error: "Erreur de hash" });
+        db.query(
+          "UPDATE Utilisateur SET mot_de_passe = ?, is_hashed = 1 WHERE id_utilisateur = ?",
+          [hashedPassword, user.id_utilisateur],
+          (errUpdate) => {
+            if (errUpdate) return res.status(500).json({ success: false, error: "Erreur MySQL" });
+            // La connexion réussit, le compte est migré ! :)
+            return sendJwt(res, user);
+          }
+        );
+      });
+    }
   });
 });
 
@@ -558,25 +583,32 @@ app.post('/api/register', (req, res) => {
     if (err) return res.status(500).json({ success: false, error: "Erreur MySQL" });
     if (rows.length) return res.json({ success: false, error: "Email déjà utilisé." });
 
-    // Récupère le dernier myefrei_id pour incrémenter
-    db.query('SELECT myefrei_id FROM Utilisateur ORDER BY id_utilisateur DESC LIMIT 1', (err2, rows2) => {
-      let newId = 1;
-      if (!err2 && rows2.length > 0) {
-        const lastId = parseInt(rows2[0].myefrei_id.replace('efrei', ''), 10);
-        newId = lastId + 1;
+    // Hash le mot de passe AVANT insertion !
+    bcrypt.hash(password, SALT_ROUNDS, (errHash, hash) => {
+      if (errHash) {
+        console.error(errHash);
+        return res.status(500).json({ success: false, error: "Erreur lors du hash du mot de passe" });
       }
-      const myefrei_id = `efrei${String(newId).padStart(3, '0')}`;
-      db.query(
-        'INSERT INTO Utilisateur (myefrei_id, prenom, nom, email, mot_de_passe, id_role) VALUES (?, ?, ?, ?, ?, 2)',
-        [myefrei_id, prenom, nom, email, password],
-        (err3) => {
-          if (err3) {
-            console.error("Erreur MySQL (insert):", err3);
-            return res.status(500).json({ success: false, error: "Erreur MySQL (insert): " + err3.sqlMessage });
-          }
-          res.json({ success: true });
+      // Récupère le dernier myefrei_id pour incrémenter
+      db.query('SELECT myefrei_id FROM Utilisateur ORDER BY id_utilisateur DESC LIMIT 1', (err2, rows2) => {
+        let newId = 1;
+        if (!err2 && rows2.length > 0) {
+          const lastId = parseInt(rows2[0].myefrei_id.replace('efrei', ''), 10);
+          newId = lastId + 1;
         }
-      );
+        const myefrei_id = `efrei${String(newId).padStart(3, '0')}`;
+        db.query(
+          'INSERT INTO Utilisateur (myefrei_id, prenom, nom, email, mot_de_passe, id_role, is_hashed) VALUES (?, ?, ?, ?, ?, 2, 1)',
+          [myefrei_id, prenom, nom, email, hash],
+          (err3) => {
+            if (err3) {
+              console.error("Erreur MySQL (insert):", err3);
+              return res.status(500).json({ success: false, error: "Erreur MySQL (insert): " + err3.sqlMessage });
+            }
+            res.json({ success: true });
+          }
+        );
+      });
     });
   });
 });

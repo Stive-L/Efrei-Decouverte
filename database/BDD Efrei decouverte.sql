@@ -205,3 +205,5 @@ CREATE TABLE StatistiquesEco (
   PRIMARY KEY (id_stat),
   UNIQUE KEY uq_date_stat (date_stat)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Statistiques sur l’impact écologique et l’activité du site';
+
+ALTER TABLE Utilisateur ADD COLUMN is_hashed BOOLEAN NOT NULL DEFAULT 0;
