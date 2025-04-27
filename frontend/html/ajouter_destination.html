@@ -71,6 +71,7 @@
   <!-- Menu utilisateur / admin -->
   <script src="../js/connexion.js"></script>
   <script src="../js/config.js"></script>
+  <script src="../js/autofetch.js"></script>
   <script>
     // --- Sécurité : seuls les admins (role="1") peuvent accéder ---
     if (localStorage.getItem('id_role') !== "1") {
@@ -104,7 +105,7 @@
       }
 
       // Envoi au back
-      fetch(window.API_BASE_URL + '/api/destinations', {
+      autoFetch(window.API_BASE_URL + '/api/destinations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

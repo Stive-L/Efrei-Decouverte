@@ -47,11 +47,12 @@
   </footer>
   <script src="../js/config.js"></script>
   <script src="../js/connexion.js"></script>
+  <script src="../js/autofetch.js"></script>
   <script>
     const id_utilisateur = localStorage.getItem('id_utilisateur');
 
     // Remplir la liste des destinations
-    fetch(window.API_BASE_URL + '/api/destinations')
+    autoFetch(window.API_BASE_URL + '/api/destinations')
       .then(res => res.json())
       .then(destinations => {
         if (!Array.isArray(destinations)) {
@@ -70,7 +71,7 @@
     // Récupérer toutes les réponses pour chaque message (forum)
     async function getReponses(id_message) {
       try {
-        const res = await fetch(`${window.API_BASE_URL}/api/forum/${id_message}/reponses`);
+        const res = await autoFetch(`${window.API_BASE_URL}/api/forum/${id_message}/reponses`);
         if (!res.ok) return [];
         return await res.json();
       } catch {
@@ -80,7 +81,7 @@
 
     // Affichage forum avec réponses imbriquées + bouton pour répondre
     async function chargerForum() {
-      fetch(window.API_BASE_URL + '/api/forum')
+      autoFetch(window.API_BASE_URL + '/api/forum')
         .then(res => res.json())
         .then(async messages => {
           const div = document.getElementById('forum-messages');
@@ -164,7 +165,7 @@
               }
               const id_message = form.getAttribute('data-id');
               const contenu = form.contenu.value;
-              fetch(`${window.API_BASE_URL}/api/forum/${id_message}/reponses`, {
+              autoFetch(`${window.API_BASE_URL}/api/forum/${id_message}/reponses`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ id_utilisateur, contenu })
@@ -200,7 +201,7 @@
         id_destination: form.destination.value,
         contenu: form.contenu.value
       };
-      fetch(window.API_BASE_URL + '/api/forum', {
+      autoFetch(window.API_BASE_URL + '/api/forum', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -228,7 +229,7 @@
     function supprimerMessage(id_message) {
       const id_utilisateur = localStorage.getItem('id_utilisateur');
       if (!confirm('Supprimer ce message ?')) return;
-      fetch(`${window.API_BASE_URL}/api/forum/${id_message}`, {
+      autoFetch(`${window.API_BASE_URL}/api/forum/${id_message}`, {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ id_utilisateur })
@@ -243,7 +244,7 @@
     function supprimerReponse(id_reponse) {
       const id_utilisateur = localStorage.getItem('id_utilisateur');
       if (!confirm('Supprimer cette réponse ?')) return;
-      fetch(`${window.API_BASE_URL}/api/forum/reponse/${id_reponse}`, {
+      autoFetch(`${window.API_BASE_URL}/api/forum/reponse/${id_reponse}`, {
         method: 'DELETE',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ id_utilisateur })

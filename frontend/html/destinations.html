@@ -48,6 +48,7 @@
   </footer>
   <script src="../js/connexion.js"></script>
   <script src="../js/config.js"></script>
+  <script src="../js/autofetch.js"></script>
   <script>
     // Récupère les destinations et gère les favoris
     const id_utilisateur = localStorage.getItem('id_utilisateur');
@@ -56,7 +57,7 @@ let allDestinations = [];
 
 function loadDestinationsWithFavoris() {
   if (id_utilisateur) {
-    fetch(window.API_BASE_URL + "/api/favoris/" + id_utilisateur)
+    autoFetch(window.API_BASE_URL + "/api/favoris/" + id_utilisateur)
       .then(res => res.json())
       .then(favs => {
         favorisIds = favs.map(f => f.id_destination);
@@ -69,7 +70,7 @@ function loadDestinationsWithFavoris() {
 }
 
 function loadDestinations() {
-  fetch(window.API_BASE_URL + "/api/destinations")
+  autoFetch(window.API_BASE_URL + "/api/destinations")
     .then(res => res.json())
     .then(data => {
       allDestinations = data;
@@ -119,7 +120,7 @@ function addStarListeners() {
         window.location.href = "login.html";
         return;
       }
-      fetch(window.API_BASE_URL + "/api/favoris", {
+      autoFetch(window.API_BASE_URL + "/api/favoris", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ id_utilisateur, id_destination })

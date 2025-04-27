@@ -87,6 +87,7 @@
 
   <script src="../js/config.js"></script>
   <script src="../js/connexion.js"></script>
+  <script src="../js/autofetch.js"></script>
   <script>
     // Vérifier que l'utilisateur est connecté
     const id_utilisateur = localStorage.getItem('id_utilisateur');
@@ -95,7 +96,7 @@
     }
 
     // Remplir le select des destinations
-    fetch(window.API_BASE_URL + "/api/destinations")
+    autoFetch(window.API_BASE_URL + "/api/destinations")
       .then(res => res.json())
       .then(destinations => {
         const select = document.getElementById('destination');
@@ -124,7 +125,7 @@
         }
       };
 
-      fetch(window.API_BASE_URL + "/api/avis", {
+      autoFetch(window.API_BASE_URL + "/api/avis", {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(data)
@@ -149,7 +150,7 @@
       const id_utilisateur = localStorage.getItem('id_utilisateur');
       if (!id_utilisateur) return;
 
-      fetch(window.API_BASE_URL + "/api/mes-avis/" + id_utilisateur)
+      autoFetch(window.API_BASE_URL + "/api/mes-avis/" + id_utilisateur)
         .then(res => res.json())
         .then(avisList => {
           const ul = document.getElementById('mes-avis-list');
@@ -175,7 +176,7 @@
           document.querySelectorAll('.supprimer-avis-btn').forEach(btn => {
             btn.onclick = function() {
               if (confirm("Supprimer cet avis ?")) {
-                fetch(window.API_BASE_URL + "/api/avis/" + btn.dataset.id, { method: 'DELETE' })
+                autoFetch(window.API_BASE_URL + "/api/avis/" + btn.dataset.id, { method: 'DELETE' })
                 .then(res => res.json())
                 .then(result => {
                   if(result.success) {
@@ -229,7 +230,7 @@
         }
       };
 
-      fetch(window.API_BASE_URL + '/api/avis/' + id_avis, {
+      autoFetch(window.API_BASE_URL + '/api/avis/' + id_avis, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
