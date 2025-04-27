@@ -109,6 +109,7 @@
                 localStorage.setItem('prenom', data.user.prenom);
                 localStorage.setItem('id_role', data.user.id_role);
                 localStorage.setItem('id_utilisateur', data.user.id_utilisateur);
+                localStorage.setItem('token', data.token);
                 window.location.href = "../index.html";
             } else {
                 loginErrorDiv.textContent = data.error || "Identifiants incorrects";
