@@ -10,7 +10,7 @@ const PORT = 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'vraiment_change_ceci_en_prod';
 
 app.use(cors({
-  origin: 'https://efrei-test.up.railway.app/'
+  origin: 'https://efrei-test.up.railway.app'
 }));
 app.use(express.json());
 
