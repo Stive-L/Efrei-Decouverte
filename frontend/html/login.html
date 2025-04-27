@@ -105,10 +105,10 @@
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                localStorage.setItem('nom', data.nom);
-                localStorage.setItem('prenom', data.prenom);
-                localStorage.setItem('id_role', data.id_role);
-                localStorage.setItem('id_utilisateur', data.id_utilisateur);
+                localStorage.setItem('nom', data.user.nom);
+                localStorage.setItem('prenom', data.user.prenom);
+                localStorage.setItem('id_role', data.user.id_role);
+                localStorage.setItem('id_utilisateur', data.user.id_utilisateur);
                 window.location.href = "../index.html";
             } else {
                 loginErrorDiv.textContent = data.error || "Identifiants incorrects";
