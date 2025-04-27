@@ -69,7 +69,7 @@ README.md
 
 ---
 
-## Installation locale
+## Installation
 
 ### 1. Cloner le dépôt
 
@@ -78,34 +78,21 @@ git clone https://github.com/votre-utilisateur/efrei-decouverte.git
 cd efrei-decouverte
 ```
 
-### 2. Configurer la base de données MySQL
+---
 
-- Importer **`BDD Efrei decouverte.sql`** dans votre MySQL.
-- Importer **`Table de données.sql`** pour pré-remplir avec des exemples.
+### ⚡ 2. Utilisation recommandée (hébergée)
 
+- **Il n'est plus nécessaire de lancer le back-end ou la base de données en local.**
+- **Tout fonctionne déjà** grâce à l’API et la base de données hébergées sur Railway.
+- Il suffit d’**ouvrir le fichier `index.html`** du dossier `frontend/html` dans votre navigateur pour utiliser l’application.
 
+### 🛠️ 3. Utilisation avancée (développement local)
 
-### 3. Back-end
+> **Pour les développeurs voulant modifier le back-end ou travailler sans accès à Railway** :
+  1. Suivez les étapes ci-dessus pour l'installation locale.
+  2. **Pensez à modifier les paramètres de connexion à la base de données dans** `backend/app.js`
 
-```bash
-cd backend
-npm install
-```
-
-Lancer l’API :
-
-```bash
-npm start
-```
-
-Le serveur tourne sur [http://localhost:3000](http://localhost:3000)
-
-
-
-### 4. Front-end
-
-Ouvrir `frontend/index.html`  
-
+   
 ---
 
 ## Équipe projet
