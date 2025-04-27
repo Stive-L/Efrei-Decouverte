@@ -1,11 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+// À changer par un vrai secret en prod !
+const JWT_SECRET = process.env.JWT_SECRET || 'vraiment_change_ceci_en_prod';
+
+app.use(cors({
+  origin: 'https://ton-site-front.com'
+}));
 app.use(express.json());
 
 // ==========================
@@ -22,6 +28,7 @@ const db = mysql.createPool({
   queueLimit: 0
 });
 
+
 // Pour vérifier que ça marche (optionnel)
 db.getConnection((err, connection) => {
   if (err) {
@@ -32,7 +39,24 @@ db.getConnection((err, connection) => {
   }
 });
 
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Token manquant' });
 
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Token invalide' });
+    req.user = user; // user = { id_utilisateur, id_role, ... }
+    next();
+  });
+}
+
+function requireAdmin(req, res, next) {
+  if (req.user.id_role !== 1) {
+    return res.status(403).json({ error: "Accès réservé à l'admin" });
+  }
+  next();
+}
 // ==========================
 //   ROUTES DESTINATIONS
 //   (destinations.html)
@@ -48,26 +72,27 @@ app.get('/api/destinations', (req, res) => {
 });
 
 // Ajout ou suppression favori (toggle)
-app.post('/api/favoris', (req, res) => {
-    const { id_utilisateur, id_destination } = req.body;
-    // Vérifier si déjà favori
-    db.query("SELECT * FROM Favori WHERE id_utilisateur=? AND id_destination=?", [id_utilisateur, id_destination], (err, results) => {
-      if (err) return res.status(500).json({ success: false });
-      if (results.length) {
-        // Si existe, supprimer (toggle off)
-        db.query("DELETE FROM Favori WHERE id_utilisateur=? AND id_destination=?", [id_utilisateur, id_destination], (err2) => {
-          if (err2) return res.status(500).json({ success: false });
-          res.json({ success: true, removed: true });
-        });
-      } else {
-        // Sinon, ajouter (toggle on)
-        db.query("INSERT INTO Favori (id_utilisateur, id_destination) VALUES (?, ?)", [id_utilisateur, id_destination], (err3) => {
-          if (err3) return res.status(500).json({ success: false });
-          res.json({ success: true, added: true });
-        });
-      }
-    });
+app.post('/api/favoris', authenticateToken, (req, res) => {
+  const id_utilisateur = req.user.id_utilisateur; // Prend l'id du token
+  const { id_destination } = req.body;
+  // Vérifier si déjà favori
+  db.query("SELECT * FROM Favori WHERE id_utilisateur=? AND id_destination=?", [id_utilisateur, id_destination], (err, results) => {
+    if (err) return res.status(500).json({ success: false });
+    if (results.length) {
+      db.query("DELETE FROM Favori WHERE id_utilisateur=? AND id_destination=?", [id_utilisateur, id_destination], (err2) => {
+        if (err2) return res.status(500).json({ success: false });
+        res.json({ success: true, removed: true });
+      });
+    } else {
+      db.query("INSERT INTO Favori (id_utilisateur, id_destination) VALUES (?, ?)", [id_utilisateur, id_destination], (err3) => {
+        if (err3) return res.status(500).json({ success: false });
+        res.json({ success: true, added: true });
+      });
+    }
   });
+});
+
+
 
 // ==========================
 //   ROUTES AVIS
@@ -106,49 +131,44 @@ app.get('/api/avis', (req, res) => {
 // ==========================
 
 app.post('/api/login', (req, res) => {
-    const { email, password } = req.body;
-  
-    // On vérifie que l’email existe et que le mot de passe correspond
-    const sql = `
-      SELECT id_utilisateur, nom, prenom, email, mot_de_passe, id_role
-      FROM Utilisateur
-      WHERE email = ?
-      LIMIT 1
-    `;
-  
-    db.query(sql, [email], (err, results) => {
-      if (err) {
-        return res.status(500).json({ success: false, error: "Erreur MySQL" });
-      }
-      if (results.length === 0) {
-        // Aucun utilisateur trouvé
-        return res.json({ success: false, error: "Email ou mot de passe incorrect" });
-      }
-  
-      const user = results[0];
-      // Ici, pour l’exemple, on compare le mot de passe en clair (dev only)
-      if (user.mot_de_passe !== password) {
-        return res.json({ success: false, error: "Email ou mot de passe incorrect" });
-      }
-  
-      // Auth OK, on renvoie les infos utiles (NE JAMAIS renvoyer le mdp)
-      res.json({
-        success: true,
-        id_utilisateur: user.id_utilisateur,
-        nom: user.nom,
-        prenom: user.prenom,
-        email: user.email,
-        id_role: user.id_role // 1 = admin
-      });
+  const { email, password } = req.body;
+  const sql = `SELECT id_utilisateur, nom, prenom, email, mot_de_passe, id_role FROM Utilisateur WHERE email = ? LIMIT 1`;
+
+  db.query(sql, [email], (err, results) => {
+    if (err) return res.status(500).json({ success: false, error: "Erreur MySQL" });
+    if (results.length === 0) return res.json({ success: false, error: "Email ou mot de passe incorrect" });
+
+    const user = results[0];
+    if (user.mot_de_passe !== password) return res.json({ success: false, error: "Email ou mot de passe incorrect" });
+
+    // JWT payload : ne JAMAIS inclure le mot de passe
+    const payload = {
+      id_utilisateur: user.id_utilisateur,
+      nom: user.nom,
+      prenom: user.prenom,
+      email: user.email,
+      id_role: user.id_role
+    };
+
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
+    res.json({
+      success: true,
+      token, // Le frontend doit stocker ce token (pas dans localStorage, mais dans memory/cookie sécurisé idéalement)
+      user: payload
     });
   });
+});
 
 // ==========================
 //   ROUTE FAVORIS 
 //   (favoris.html)
 // ==========================
-app.get('/api/favoris/:id_utilisateur', (req, res) => {
-    const idUtilisateur = req.params.id_utilisateur;
+app.get('/api/favoris/:id_utilisateur', authenticateToken, (req, res) => {
+    const idUtilisateur = parseInt(req.params.id_utilisateur, 10);
+    if (idUtilisateur !== req.user.id_utilisateur) {
+      return res.status(403).json({ error: "Accès interdit" });
+    }
     const sql = `
       SELECT f.id_utilisateur, f.id_destination, f.date_ajout, d.*
       FROM Favori f
@@ -169,8 +189,9 @@ app.get('/api/favoris/:id_utilisateur', (req, res) => {
 //   ROUTE AJOUT AVIS (POST)
 //   (poster_avis.html)
 // ==========================
-app.post('/api/avis', (req, res) => {
-    const { id_utilisateur, id_destination, code_type, annee_mobilite, commentaire, notes } = req.body;
+app.post('/api/avis', authenticateToken, (req, res) => {
+    const id_utilisateur = req.user.id_utilisateur;
+    const { id_destination, code_type, annee_mobilite, commentaire, notes } = req.body;
   
     // 1. Ajouter l'avis principal
     const insertAvis = `
@@ -200,8 +221,11 @@ app.post('/api/avis', (req, res) => {
 
 
 // --- Récupérer tous les avis d’un utilisateur ---
-app.get('/api/mes-avis/:id_utilisateur', (req, res) => {
-    const idUtilisateur = req.params.id_utilisateur;
+app.get('/api/mes-avis/:id_utilisateur', authenticateToken, (req, res) => {
+    const idUtilisateur = parseInt(req.params.id_utilisateur, 10);
+    if (idUtilisateur !== req.user.id_utilisateur) {
+      return res.status(403).json({ error: "Accès interdit" });
+    }
     const sql = `
       SELECT 
         a.id_avis, a.commentaire, a.annee_mobilite, a.code_type, a.date_creation,
@@ -221,15 +245,20 @@ app.get('/api/mes-avis/:id_utilisateur', (req, res) => {
   });
 
 // --- Supprimer un avis par son id ---
-app.delete('/api/avis/:id_avis', (req, res) => {
-    const idAvis = req.params.id_avis;
-    db.query("DELETE FROM Avis WHERE id_avis = ?", [idAvis], (err, result) => {
-        if (err) {
-            res.status(500).json({ error: 'Erreur MySQL lors de la suppression.' });
-        } else {
-            res.json({ success: true });
-        }
+app.delete('/api/avis/:id_avis', authenticateToken, (req, res) => {
+  const id_avis = req.params.id_avis;
+  const id_utilisateur = req.user.id_utilisateur;
+  // Vérifie que le user est bien l'auteur
+  db.query('SELECT * FROM Avis WHERE id_avis = ?', [id_avis], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Erreur MySQL' });
+    if (!results.length || results[0].id_utilisateur !== id_utilisateur) {
+      return res.status(403).json({ error: 'Action non autorisée' });
+    }
+    db.query("DELETE FROM Avis WHERE id_avis = ?", [id_avis], (err2) => {
+      if (err2) return res.status(500).json({ error: 'Erreur MySQL lors de la suppression.' });
+      res.json({ success: true });
     });
+  });
 });
 
 // ========== Détail d'une destination ==========
@@ -265,7 +294,7 @@ app.get('/api/avis/destination/:id_destination', (req, res) => {
   });
 });
 
-app.get('/api/avis/:id_avis/like/:id_utilisateur', (req, res) => {
+app.get('/api/avis/:id_avis/like/:id_utilisateur', authenticateToken, (req, res) => {
   const { id_avis, id_utilisateur } = req.params;
   db.query(
     "SELECT * FROM LikeAvis WHERE id_avis=? AND id_utilisateur=?",
@@ -277,8 +306,8 @@ app.get('/api/avis/:id_avis/like/:id_utilisateur', (req, res) => {
   );
 });
 
-app.post('/api/avis/:id_avis/like', (req, res) => {
-  const { id_utilisateur } = req.body;
+app.post('/api/avis/:id_avis/like', authenticateToken, (req, res) => {
+  const id_utilisateur = req.user.id_utilisateur;
   const id_avis = req.params.id_avis;
 
   // Vérifie si déjà liké
@@ -325,9 +354,10 @@ app.get('/api/avis/:id_avis/likes', (req, res) => {
   );
 });
 
-app.post('/api/avis/signaler', (req, res) => {
-  const { id_avis, id_utilisateur, motif } = req.body;
-  if (!id_avis || !id_utilisateur || !motif) {
+app.post('/api/avis/signaler', authenticateToken, (req, res) => {
+  const id_utilisateur = req.user.id_utilisateur;
+  const { id_avis, motif } = req.body;
+  if (!id_avis || !motif) {
     return res.status(400).json({ success: false, error: "Données manquantes." });
   }
   db.query(
@@ -359,9 +389,10 @@ app.get('/api/forum', (req, res) => {
   );
 });
 
-app.post('/api/forum', (req, res) => {
-  const { id_utilisateur, id_destination, contenu } = req.body;
-  if (!id_utilisateur || !id_destination || !contenu) {
+app.post('/api/forum', authenticateToken, (req, res) => {
+  const id_utilisateur = req.user.id_utilisateur;
+  const { id_destination, contenu } = req.body;
+  if (!id_destination || !contenu) {
     return res.status(400).json({ error: "Champs manquants" });
   }
   db.query(
@@ -391,10 +422,11 @@ app.get('/api/forum/:id_message/reponses', (req, res) => {
   });
 });
 
-app.post('/api/forum/:id_message/reponses', (req, res) => {
-  const { id_utilisateur, contenu } = req.body;
+app.post('/api/forum/:id_message/reponses', authenticateToken, (req, res) => {
+  const id_utilisateur = req.user.id_utilisateur;
+  const { contenu } = req.body;
   const id_message = req.params.id_message;
-  if (!id_utilisateur || !contenu) {
+  if (!contenu) {
     return res.status(400).json({ error: "Champs manquants" });
   }
   db.query(
@@ -407,9 +439,9 @@ app.post('/api/forum/:id_message/reponses', (req, res) => {
   );
 });
 
-app.delete('/api/forum/:id_message', (req, res) => {
+app.delete('/api/forum/:id_message', authenticateToken, (req, res) => {
   const id_message = req.params.id_message;
-  const id_utilisateur = req.body.id_utilisateur; // doit être envoyé côté client
+  const id_utilisateur = req.user.id_utilisateur;
   // On vérifie si l'utilisateur est l'auteur
   db.query(
     'SELECT * FROM ForumDestination WHERE id_message = ? AND id_utilisateur = ?',
@@ -418,9 +450,7 @@ app.delete('/api/forum/:id_message', (req, res) => {
       if (err) return res.status(500).json({ error: 'Erreur MySQL' });
       if (results.length === 0)
         return res.status(403).json({ error: 'Action non autorisée' });
-      // Supprime d'abord les réponses associées
       db.query('DELETE FROM forum_reponse WHERE id_message = ?', [id_message], () => {
-        // Puis supprime le message principal
         db.query('DELETE FROM ForumDestination WHERE id_message = ?', [id_message], (err2) => {
           if (err2) return res.status(500).json({ error: 'Erreur MySQL' });
           res.json({ success: true });
@@ -430,10 +460,9 @@ app.delete('/api/forum/:id_message', (req, res) => {
   );
 });
 
-app.delete('/api/forum/reponse/:id_reponse', (req, res) => {
+app.delete('/api/forum/reponse/:id_reponse', authenticateToken, (req, res) => {
   const id_reponse = req.params.id_reponse;
-  const id_utilisateur = req.body.id_utilisateur;
-  // Vérifie si l'utilisateur est l'auteur de la réponse
+  const id_utilisateur = req.user.id_utilisateur;
   db.query(
     'SELECT * FROM forum_reponse WHERE id_reponse = ? AND id_utilisateur = ?',
     [id_reponse, id_utilisateur],
@@ -450,7 +479,7 @@ app.delete('/api/forum/reponse/:id_reponse', (req, res) => {
 });
 
 // Récupérer tous les avis signalés (pour admin)
-app.get('/api/signalements', (req, res) => {
+app.get('/api/signalements', authenticateToken, requireAdmin, (req, res) => {
   const sql = `
     SELECT s.*, a.commentaire, a.id_avis, u.prenom, u.nom, d.universite, d.ville, d.pays
     FROM SignalementAvis s
@@ -466,7 +495,7 @@ app.get('/api/signalements', (req, res) => {
 });
 
 // Valider un signalement (supprimer l'avis et marquer traité)
-app.post('/api/admin/signalement/valider', (req, res) => {
+app.post('/api/admin/signalement/valider', authenticateToken, requireAdmin, (req, res) => {
   const { id_signalement, id_avis } = req.body;
   // Suppression de l'avis + update du signalement
   db.query("DELETE FROM Avis WHERE id_avis = ?", [id_avis], (err) => {
@@ -479,7 +508,7 @@ app.post('/api/admin/signalement/valider', (req, res) => {
 });
 
 // Ignorer un signalement (marquer traité mais garder l'avis)
-app.post('/api/admin/signalement/ignorer', (req, res) => {
+app.post('/api/admin/signalement/ignorer', authenticateToken, requireAdmin, (req, res) => {
   const { id_signalement } = req.body;
   db.query("UPDATE SignalementAvis SET statut = 'traite' WHERE id_signalement = ?", [id_signalement], (err) => {
     if (err) return res.status(500).json({ success: false, error: "Erreur statut signalement" });
@@ -491,7 +520,7 @@ app.post('/api/admin/signalement/ignorer', (req, res) => {
 
 
 // === Ajout d’une nouvelle destination ===
-app.post('/api/destinations', (req, res) => {
+app.post('/api/destinations', authenticateToken, requireAdmin, (req, res) => {
   const { pays, universite, ville, langue, cout_vie_moyen,
           url_universite, empreinte_carbone, nombre_etudiants } = req.body;
   // validation basique...
@@ -552,32 +581,40 @@ app.post('/api/register', (req, res) => {
   });
 });
 
-app.put('/api/avis/:id', (req, res) => {
+app.put('/api/avis/:id', authenticateToken, (req, res) => {
   const id_avis = req.params.id;
+  const id_utilisateur = req.user.id_utilisateur;
   const { commentaire, notes } = req.body;
-
-  // 1. Mise à jour du commentaire dans Avis
-  db.query('UPDATE Avis SET commentaire = ? WHERE id_avis = ?', [commentaire, id_avis], (err, result) => {
+  // Vérifie que le user est bien l'auteur
+  db.query('SELECT * FROM Avis WHERE id_avis = ?', [id_avis], (err, results) => {
     if (err) return res.status(500).json({ success: false, error: "Erreur SQL (avis)" });
+    if (!results.length || results[0].id_utilisateur !== id_utilisateur) {
+      return res.status(403).json({ error: "Action non autorisée" });
+    }
 
-    // 2. Mise à jour des notes (notation) pour chaque critère
-    const criteres = ['qualite_cours', 'logement', 'climat', 'vie_locale', 'accessibilite'];
-    let done = 0;
-    let erreur = false;
+    // 1. Mise à jour du commentaire dans Avis
+    db.query('UPDATE Avis SET commentaire = ? WHERE id_avis = ?', [commentaire, id_avis], (err, result) => {
+      if (err) return res.status(500).json({ success: false, error: "Erreur SQL (avis)" });
 
-    criteres.forEach(critere => {
-      db.query(
-        'UPDATE Notation SET note = ? WHERE id_avis = ? AND critere = ?',
-        [notes[critere], id_avis, critere],
-        (err2, result2) => {
-          if (err2) erreur = true;
-          done++;
-          if (done === criteres.length) {
-            if (erreur) return res.status(500).json({ success: false, error: "Erreur SQL (notation)" });
-            return res.json({ success: true });
+      // 2. Mise à jour des notes (notation) pour chaque critère
+      const criteres = ['qualite_cours', 'logement', 'climat', 'vie_locale', 'accessibilite'];
+      let done = 0;
+      let erreur = false;
+
+      criteres.forEach(critere => {
+        db.query(
+          'UPDATE Notation SET note = ? WHERE id_avis = ? AND critere = ?',
+          [notes[critere], id_avis, critere],
+          (err2, result2) => {
+            if (err2) erreur = true;
+            done++;
+            if (done === criteres.length) {
+              if (erreur) return res.status(500).json({ success: false, error: "Erreur SQL (notation)" });
+              return res.json({ success: true });
+            }
           }
-        }
-      );
+        );
+      });
     });
   });
 });
