@@ -74,7 +74,7 @@ README.md
 ### 1. Cloner le dépôt
 
 ```bash
-git clone [https://github.com/votre-utilisateur/efrei-decouverte.git](https://github.com/Stive-L/Efrei-Decouverte)
+git clone https://github.com/Stive-L/Efrei-Decouverte
 cd efrei-decouverte
 ```
 
