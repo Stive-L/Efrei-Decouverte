@@ -57,7 +57,7 @@
 </footer>
 <script src="../js/config.js"></script>
 <script src="../js/connexion.js"></script>
-<script src="../js/autofetch.js"></script>
+<script src="../js/authFetch.js"></script>
 <script>
     // SÉCURITÉ : Affiche que le bon form au chargement
     window.addEventListener('DOMContentLoaded', function() {
@@ -98,7 +98,7 @@
             loginErrorDiv.style.display = "block";
             return;
         }
-        autoFetch(window.API_BASE_URL + '/api/login', {
+        authFetch(window.API_BASE_URL + '/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -147,7 +147,7 @@
             return;
         }
 
-        autoFetch(window.API_BASE_URL + '/api/register', {
+        authFetch(window.API_BASE_URL + '/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prenom, nom, email, password })

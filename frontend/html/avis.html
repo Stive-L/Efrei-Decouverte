@@ -54,7 +54,7 @@
     <script src="../js/connexion.js"></script>
     <script src="../js/avis_actions.js"></script>
     <script src="../js/config.js"></script>
-    <script src="../js/autofetch.js"></script>
+    <script src="../js/authFetch.js"></script>
     <script>
         let allAvis = [];
 
@@ -142,7 +142,7 @@
         // Load tous les avis, enrichis likes, puis affiche
         async function afficherTousLesAvis() {
             try {
-                const res = await autoFetch(window.API_BASE_URL + '/api/avis');
+                const res = await authFetch(window.API_BASE_URL + '/api/avis');
                 const avisList = await res.json();
                 if (!avisList.length) {
                     afficherAvis([]);
@@ -154,14 +154,14 @@
                     let liked = false;
                     if (id_utilisateur) {
                         try {
-                            const resLike = await autoFetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`);
+                            const resLike = await authFetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`);
                             const dataLike = await resLike.json();
                             liked = dataLike.liked;
                         } catch (e) { liked = false; }
                     }
                     let nbLikes = 0;
                     try {
-                        const resNb = await autoFetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`);
+                        const resNb = await authFetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`);
                         const dataNb = await resNb.json();
                         nbLikes = dataNb.likes;
                     } catch (e) { nbLikes = avis.likes || 0; }

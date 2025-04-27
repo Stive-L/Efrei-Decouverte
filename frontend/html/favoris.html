@@ -29,7 +29,7 @@
   </main>
   <script src="../js/config.js"></script>
   <script src="../js/connexion.js"></script>
-  <script src="../js/autofetch.js"></script>
+  <script src="../js/authFetch.js"></script>
   <script>
     // Vérifier que l'utilisateur est connecté
     const idUtilisateur = localStorage.getItem('id_utilisateur');
@@ -37,7 +37,7 @@
       window.location.href = "login.html";
     }
 
-    autoFetch(`${window.API_BASE_URL}/api/favoris/${idUtilisateur}`)
+    authFetch(`${window.API_BASE_URL}/api/favoris/${idUtilisateur}`)
       .then(res => res.json())
       .then(favoris => {
         const ul = document.getElementById('favoris-list');

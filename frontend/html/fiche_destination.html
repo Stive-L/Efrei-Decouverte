@@ -41,14 +41,14 @@
   <!-- Script commun pour likes/signalements -->
   <script src="../js/avis_actions.js"></script>
   <script src="../js/config.js"></script>
-  <script src="../js/autofetch.js"></script>
+  <script src="../js/authFetch.js"></script>
   <script>
     // ------ CHARGEMENT DE LA DESTINATION ET AVIS ------
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
     if (id) {
-      autoFetch(`${window.API_BASE_URL}/api/destinations/${id}`)
+      authFetch(`${window.API_BASE_URL}/api/destinations/${id}`)
         .then(res => {
           if (!res.ok) throw new Error("HTTP error " + res.status);
           return res.json();
@@ -80,7 +80,7 @@
 
     window.afficherAvisDestination = async function(id_destination) {
   try {
-    const res = await autoFetch(`${window.API_BASE_URL}/api/avis/destination/${id_destination}`);
+    const res = await authFetch(`${window.API_BASE_URL}/api/avis/destination/${id_destination}`);
     const avisList = await res.json();
     const ul = document.getElementById("avis-list");
     if (!avisList.length) {
@@ -94,7 +94,7 @@
       let liked = false;
       if (id_utilisateur) {
         try {
-          const resLike = await autoFetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`);
+          const resLike = await authFetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/like/${id_utilisateur}`);
           const dataLike = await resLike.json();
           liked = dataLike.liked;
         } catch (e) {
@@ -103,7 +103,7 @@
       }
       let nbLikes = 0;
       try {
-        const resNb = await autoFetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`);
+        const resNb = await authFetch(`${window.API_BASE_URL}/api/avis/${avis.id_avis}/likes`);
         const dataNb = await resNb.json();
         nbLikes = dataNb.likes;
       } catch (e) {
