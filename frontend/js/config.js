@@ -1,4 +1,3 @@
-// Met l'URL de prod par défaut, et localhost si local
 window.API_BASE_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:3000"
