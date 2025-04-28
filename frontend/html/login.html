@@ -98,7 +98,7 @@
             loginErrorDiv.style.display = "block";
             return;
         }
-        authFetch(window.API_BASE_URL + '/api/login', {
+        fetch(window.API_BASE_URL + '/api/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -147,7 +147,7 @@
             return;
         }
 
-        authFetch(window.API_BASE_URL + '/api/register', {
+        fetch(window.API_BASE_URL + '/api/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prenom, nom, email, password })
