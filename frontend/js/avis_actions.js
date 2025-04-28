@@ -105,7 +105,6 @@ function showPopupSignalementHTML() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         id_avis: avisASignaler,
-        id_utilisateur,
         motif
       })
     })
