@@ -145,71 +145,87 @@
       });
     });
 
-    // Charger les avis précédents de l'utilisateur
-    function chargerMesAvis() {
-      const id_utilisateur = localStorage.getItem('id_utilisateur');
-      if (!id_utilisateur) return;
+  function safeText(text) {
+  if (!text) return "";
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
-      authFetch(window.API_BASE_URL + "/api/mes-avis/" + id_utilisateur)
-        .then(res => res.json())
-        .then(avisList => {
-          const ul = document.getElementById('mes-avis-list');
-          if (!avisList.length) {
-            ul.innerHTML = "<li>Aucun avis pour l’instant.</li>";
-            return;
-          }
-          ul.innerHTML = '';
-          avisList.forEach(avis => {
-            // Ajout du bouton modifier
-            ul.innerHTML += `
-              <li style="margin-bottom:15px;">
-                  <strong>${avis.universite}</strong> — ${avis.ville}, ${avis.pays}<br>
-                  <span><em>${avis.code_type}</em> (${avis.annee_mobilite})</span><br>
-                  <span>${avis.commentaire}</span><br>
-                  <button class="modifier-avis-btn" data-avis='${JSON.stringify(avis)}'>Modifier</button>
-                  <button class="supprimer-avis-btn" data-id="${avis.id_avis}">Supprimer</button>
-              </li>
-            `;
-          });
+function chargerMesAvis() {
+  const id_utilisateur = localStorage.getItem('id_utilisateur');
+  if (!id_utilisateur) return;
 
-          // Ajout listener pour tous les boutons supprimer
-          document.querySelectorAll('.supprimer-avis-btn').forEach(btn => {
-            btn.onclick = function() {
-              if (confirm("Supprimer cet avis ?")) {
-                authFetch(window.API_BASE_URL + "/api/avis/" + btn.dataset.id, { method: 'DELETE' })
-                .then(res => res.json())
-                .then(result => {
-                  if(result.success) {
-                    btn.parentElement.remove();
-                  } else {
-                    alert("Erreur lors de la suppression.");
-                  }
-                });
+  authFetch(window.API_BASE_URL + "/api/mes-avis/" + id_utilisateur)
+    .then(res => res.json())
+    .then(avisList => {
+      const ul = document.getElementById('mes-avis-list');
+      if (!avisList.length) {
+        ul.innerHTML = "<li>Aucun avis pour l’instant.</li>";
+        return;
+      }
+      ul.innerHTML = '';
+      avisList.forEach(avis => {
+        ul.innerHTML += `
+          <li style="margin-bottom:15px;">
+              <strong>${safeText(avis.universite)}</strong> — ${safeText(avis.ville)}, ${safeText(avis.pays)}<br>
+              <span><em>${safeText(avis.code_type)}</em> (${avis.annee_mobilite})</span><br>
+              <span>${safeText(avis.commentaire)}</span><br>
+              <button class="modifier-avis-btn"
+                data-id="${avis.id_avis}"
+                data-commentaire="${safeText(avis.commentaire)}"
+                data-qualite_cours="${avis.qualite_cours}"
+                data-logement="${avis.logement}"
+                data-climat="${avis.climat}"
+                data-vie_locale="${avis.vie_locale}"
+                data-accessibilite="${avis.accessibilite}"
+              >Modifier</button>
+              <button class="supprimer-avis-btn" data-id="${avis.id_avis}">Supprimer</button>
+          </li>
+        `;
+      });
+
+      // Ajout listener pour tous les boutons supprimer
+      document.querySelectorAll('.supprimer-avis-btn').forEach(btn => {
+        btn.onclick = function() {
+          if (confirm("Supprimer cet avis ?")) {
+            authFetch(window.API_BASE_URL + "/api/avis/" + btn.dataset.id, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(result => {
+              if(result.success) {
+                btn.parentElement.remove();
+              } else {
+                alert("Erreur lors de la suppression.");
               }
-            };
-          });
-        });
-    }
+            });
+          }
+        };
+      });
+    });
+}
 
     // Appeler la fonction au chargement de la page
     chargerMesAvis();
 
     // MODIFIER UN AVIS
     document.body.addEventListener('click', function(e) {
-      if (e.target.classList.contains('modifier-avis-btn')) {
-        const avis = JSON.parse(e.target.dataset.avis);
+  if (e.target.classList.contains('modifier-avis-btn')) {
+    const btn = e.target;
 
-        document.getElementById('modif-id-avis').value = avis.id_avis;
-        document.getElementById('modif-commentaire').value = avis.commentaire;
-        document.getElementById('modif-qualite_cours').value = avis.qualite_cours;
-        document.getElementById('modif-logement').value = avis.logement;
-        document.getElementById('modif-climat').value = avis.climat;
-        document.getElementById('modif-vie_locale').value = avis.vie_locale;
-        document.getElementById('modif-accessibilite').value = avis.accessibilite;
+    document.getElementById('modif-id-avis').value = btn.dataset.id;
+    document.getElementById('modif-commentaire').value = btn.dataset.commentaire;
+    document.getElementById('modif-qualite_cours').value = btn.dataset.qualite_cours;
+    document.getElementById('modif-logement').value = btn.dataset.logement;
+    document.getElementById('modif-climat').value = btn.dataset.climat;
+    document.getElementById('modif-vie_locale').value = btn.dataset.vie_locale;
+    document.getElementById('modif-accessibilite').value = btn.dataset.accessibilite;
 
-        document.getElementById('popup-modifier-avis').style.display = 'flex';
-      }
-    });
+    document.getElementById('popup-modifier-avis').style.display = 'flex';
+  }
+});
 
     function fermerPopupModifAvis() {
       document.getElementById('popup-modifier-avis').style.display = 'none';
