@@ -2,6 +2,9 @@
  * Rendu barre de note pour un critère
  * Usage : buildNoteBar("Qualité cours", note)
  */
+
+import { authFetch } from "authFetch.js";
+
 window.API_BASE_URL =
   window.location.hostname.includes("railway.app")
     ? "https://ton-back-railway-production.up.railway.app"
@@ -30,14 +33,14 @@ window.toggleLikeAvis = function(el) {
     return;
   }
   const id_avis = el.dataset.id;
-  fetch(`${window.API_BASE_URL}/api/avis/${id_avis}/like`, {
+  authFetch(`${window.API_BASE_URL}/api/avis/${id_avis}/like`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ id_utilisateur })
   })
   .then(res => res.json())
   .then(data => {
-    fetch(`${window.API_BASE_URL}/api/avis/${id_avis}/likes`)
+    authFetch(`${window.API_BASE_URL}/api/avis/${id_avis}/likes`)
       .then(res => res.json())
       .then(({ likes }) => {
         el.querySelector('.nb-likes').textContent = likes;
@@ -97,7 +100,7 @@ function showPopupSignalementHTML() {
       alert("Merci d'indiquer un motif.");
       return;
     }
-    fetch(`${window.API_BASE_URL}/api/avis/signaler`, {
+    authFetch(`${window.API_BASE_URL}/api/avis/signaler`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
