@@ -3,8 +3,6 @@
  * Usage : buildNoteBar("Qualité cours", note)
  */
 
-import { authFetch } from "authFetch.js";
-
 window.API_BASE_URL =
   window.location.hostname.includes("railway.app")
     ? "https://ton-back-railway-production.up.railway.app"
