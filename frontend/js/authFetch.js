@@ -1,20 +1,13 @@
 // js/authFetch.js
-window.authFetch = function(url, options = {}) {
-    // Copie les options pour ne pas les modifier globalement
-    const opts = Object.assign({}, options);
-
-    // Ajoute les headers s'ils n'existent pas déjà
-    opts.headers = opts.headers || {};
-
-    // Ajoute le token s'il existe
+export function authFetch(url, options = {}) {
     const token = localStorage.getItem('token');
-    if (token) {
-        opts.headers['Authorization'] = 'Bearer ' + token;
+    if (!token) {
+      alert('Token manquant');
+      throw new Error('Token manquant');
     }
-    // Pour du JSON
-    if (!opts.headers['Content-Type']) {
-        opts.headers['Content-Type'] = 'application/json';
-    }
-
-    return fetch(url, opts);
-}
+    options.headers = {
+      ...(options.headers || {}),
+      'Authorization': `Bearer ${token}`
+    };
+    return fetch(url, options);
+  }
