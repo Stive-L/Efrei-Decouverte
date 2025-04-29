@@ -3,11 +3,9 @@ const cors = require('cors');
 const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-
 const app = express();
 const PORT = 3000;
 const SALT_ROUNDS = 10;
-
 const JWT_SECRET = process.env.JWT_SECRET || 'vrai_mot_de_passe_de_bonhomme';
 
 app.use(cors({
