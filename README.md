@@ -87,8 +87,7 @@ cd efrei-decouverte
 ### 🛠️ 3. Utilisation avancée (développement local)
 
 > **Pour les développeurs voulant modifier le back-end ou travailler sans accès à Railway** :
-  1. Suivez les étapes ci-dessus pour l'installation locale.
-  2. **Pensez à modifier les paramètres de connexion à la base de données dans** `backend/app.js`
+  1. **Pensez à modifier les paramètres de connexion à la base de données dans** `backend/app.js`
 
    
 ---
