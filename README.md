@@ -78,13 +78,13 @@ git clone https://github.com/Stive-L/Efrei-Decouverte
 cd efrei-decouverte
 ```
 
-### ⚡ 2. Utilisation recommandée (hébergée)
+### 2. Utilisation recommandée (hébergée)
 
 - **Il n'est plus nécessaire de lancer le back-end ou la base de données en local.**
 - **Tout fonctionne déjà** grâce à l’API et la base de données hébergées sur Railway.
 - Il suffit d’**ouvrir le fichier `index.html`** du dossier `frontend/html` dans votre navigateur pour utiliser l’application.
 
-### 🛠️ 3. Utilisation avancée (développement local)
+### 3. Utilisation avancée (développement local)
 
 > **Pour les développeurs voulant modifier le back-end ou travailler sans accès à Railway** :
   1. **Pensez à modifier les paramètres de connexion à la base de données dans** `backend/app.js`
